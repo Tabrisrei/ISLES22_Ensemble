@@ -1,0 +1,2 @@
+[{"outputs": [{"type": "Image", "slug": "stroke-lesion-segmentation", "filename": "33f8cf8d-ea3b-45ec-ac0d-6965fcd3093c.mha"}],
+  "inputs": [{"type": "Image", "slug": "dwi-brain-mri", "filename": "33f8cf8d-ea3b-45ec-ac0d-6965fcd3093c.mha"}]}]
