@@ -48,7 +48,7 @@ pip install -e FACTORIZER/model/factorizer/
 6. Run the following command to install MONAI package requrements of NVAUTO. It also helps check if successfully installed required package version. (nnunet installation process did not strictly determine the package version, which may raise some unpredictable error.)
 
 ```bash
-cd ISLES22_SEALS
+cd ISLES22_Ensemble
 pip install -r requirements.txt
 ```
 
