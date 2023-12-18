@@ -74,13 +74,12 @@ if __name__=='__main__':
             image_array = sitk.GetArrayFromImage(image_file)
             pred_array  = np.zeros_like(image_array)
 
-
         if result_array is None:
             result_array = np.zeros_like(pred_array)
-        else:
-            result_array += pred_array
 
-    result_array = np.where(result_array>2, 1, 0)
+        result_array += pred_array
+
+    result_array = np.where(result_array>=2, 1, 0)
     result_image = sitk.GetImageFromArray(result_array)
 
         
