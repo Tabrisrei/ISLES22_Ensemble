@@ -36,9 +36,9 @@ class ISLES22():
         adc_folder    = 'adc-brain-mri'
         flair_folder  = 'flair-brain-mri'
 
-        self.dwi_path   = glob(os.path.join(self.root, dwi_folder, '*.mha'))[0]
-        self.adc_path   = glob(os.path.join(self.root, adc_folder, '*.mha'))[0]
-        self.flair_path = glob(os.path.join(self.root, flair_folder, '*.mha'))[0]
+        self.dwi_path   = glob(os.path.join(self.root, dwi_folder, '*.nii.gz'))[0]
+        self.adc_path   = glob(os.path.join(self.root, adc_folder, '*.nii.gz'))[0]
+        self.flair_path = glob(os.path.join(self.root, flair_folder, '*.nii.gz'))[0]
 
 
 if __name__=='__main__':
@@ -47,17 +47,17 @@ if __name__=='__main__':
     parser.add_argument('-o', "--output_folder", required=True, help="folder for saving evaluation csv")
     args = parser.parse_args()
 
-    input_folder  = args.input_folder
+    input_folder = args.input_folder
     output_folder = args.output_folder
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
-    # load origin mha file path
-    raw_data_dir = '/input/images'
+    # load origin file path
+    raw_data_dir = 'input/images'
     dataset_ISLES22 = ISLES22(raw_data_dir)
     dataset_ISLES22.load_data()
 
-    # load mha image
+    # load image
     image_file = sitk.ReadImage(dataset_ISLES22.dwi_path)
 
     # major voting
@@ -65,22 +65,24 @@ if __name__=='__main__':
     result_array = None
     sub_folders = os.listdir(input_folder)
     for folder in sub_folders:
+        print(folder)
         try:
-            pred_file = glob(os.path.join(input_folder, folder, 'images', 'stroke-lesion-segmentation', '*.mha'))[0]
+            pred_file = glob(os.path.join(input_folder, folder, 'images', 'stroke-lesion-segmentation', '*.nii.gz'))[0]
             pred_image = sitk.ReadImage(pred_file)
-            pred_array = sitk.GetArrayFromImage(pred_image)
+            pred_array = sitk.GetArrayFromImage(pred_image).astype(np.int8)
         except:
             print('no prediction! generating full 0 mask!')
             image_array = sitk.GetArrayFromImage(image_file)
             pred_array  = np.zeros_like(image_array)
 
+
         if result_array is None:
-            result_array = np.zeros_like(pred_array)
+            result_array = pred_array.copy()
+        else:
+            result_array += np.asarray(pred_array)
 
-        result_array += pred_array
-
-    result_array = np.where(result_array>=2, 1, 0)
-    result_image = sitk.GetImageFromArray(result_array)
+    result_array = result_array/3 > 0.5 #
+    result_image = sitk.GetImageFromArray(result_array.astype(np.uint8))
 
         
     result_image.SetOrigin(image_file.GetOrigin())
