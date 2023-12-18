@@ -125,5 +125,5 @@ python -m ensemble_predictions -f $model_0 \
 
 python threshold_redirect.py \
                             -i test_ensemble/ \
-                            -o /output_teams/seals/images/stroke-lesion-segmentation/
+                            -o ../output_teams/seals/images/stroke-lesion-segmentation/
 

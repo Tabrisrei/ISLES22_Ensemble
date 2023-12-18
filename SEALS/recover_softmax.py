@@ -42,9 +42,9 @@ class ISLES22():
         adc_folder    = 'adc-brain-mri'
         flair_folder  = 'flair-brain-mri'
 
-        self.dwi_path   = glob(os.path.join(self.root, dwi_folder, '*.mha'))[0]
-        self.adc_path   = glob(os.path.join(self.root, adc_folder, '*.mha'))[0]
-        self.flair_path = glob(os.path.join(self.root, flair_folder, '*.mha'))[0]
+        self.dwi_path   = glob(os.path.join(self.root, dwi_folder, '*.nii.gz'))[0]
+        self.adc_path   = glob(os.path.join(self.root, adc_folder, '*.nii.gz'))[0]
+        self.flair_path = glob(os.path.join(self.root, flair_folder, '*.nii.gz'))[0]
 
 def reimplement_resize(image_file, target_file, resample_method=sitk.sitkLinear):
     """
@@ -117,7 +117,7 @@ if __name__=='__main__':
     model_type     = args.model_type
     fold_index     = args.fold_index
 
-    raw_data_dir = '/input/images'
+    raw_data_dir = '../input/images'
     dataset_ISLES22 = ISLES22(raw_data_dir)
     dataset_ISLES22.load_data()
 

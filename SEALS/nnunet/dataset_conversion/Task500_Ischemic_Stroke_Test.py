@@ -11,9 +11,12 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
+
 import pdb
 import shutil
 from glob import glob
+from pathlib import Path
+
 import string
 from tqdm import tqdm
 from typing import Tuple
@@ -39,13 +42,12 @@ class ISLES22():
         self.data_dict = {}
 
     def load_data(self):
-        dwi_folder    = 'dwi-brain-mri'
-        adc_folder    = 'adc-brain-mri'
-        flair_folder  = 'flair-brain-mri'
-
-        self.dwi_path   = glob(os.path.join(self.root, dwi_folder, '*.mha'))[0]
-        self.adc_path   = glob(os.path.join(self.root, adc_folder, '*.mha'))[0]
-        self.flair_path = glob(os.path.join(self.root, flair_folder, '*.mha'))[0]
+        dwi_folder = 'dwi-brain-mri'
+        adc_folder = 'adc-brain-mri'
+        flair_folder = 'flair-brain-mri'
+        self.dwi_path = glob(os.path.join(self.root, dwi_folder, '*.nii.gz'))[0]
+        self.adc_path = glob(os.path.join(self.root, adc_folder, '*.nii.gz'))[0]
+        self.flair_path = glob(os.path.join(self.root, flair_folder, '*.nii.gz'))[0]
 
 
 def respacing_file(image_file, target_spacing, resample_method):
@@ -134,7 +136,7 @@ def reimplement_resize(image_file, target_file, resample_method=sitk.sitkLinear)
 if __name__ == "__main__":
 
     task_name = "Task500_Ischemic_Stroke_Test"
-    raw_data_dir = '/input/images'
+    raw_data_dir = '../input/images'
     dataset_ISLES22 = ISLES22(raw_data_dir)
     dataset_ISLES22.load_data()
 

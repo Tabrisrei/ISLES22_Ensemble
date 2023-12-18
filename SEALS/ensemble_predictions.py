@@ -145,7 +145,7 @@ def merge(folders, output_folder, threads, override=True, postprocessing_file=No
     out_files = []
     for p in patient_ids:
         files.append([join(f, p + ".npz") for f in folders])
-        out_files.append(join(output_folder, p + ".mha"))
+        out_files.append(join(output_folder, p + ".nii.gz"))
 
     p = Pool(threads)
     p.starmap(merge_files, zip(files, out_files, [override] * len(out_files), [store_npz] * len(out_files)))

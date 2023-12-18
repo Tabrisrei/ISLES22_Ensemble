@@ -2,12 +2,12 @@ import json
 import os
 import SimpleITK as sitk
 from pathlib import Path
-
+import numpy as np
 from predict import predict
 
-DEFAULT_INPUT_PATH = Path("/input")
-DEFAULT_ALGORITHM_OUTPUT_IMAGES_PATH = Path("/output_teams/factorizer/images/")
-DEFAULT_ALGORITHM_OUTPUT_FILE_PATH = Path("/output_teams/factorizer/results.json")
+DEFAULT_INPUT_PATH = Path("../input")
+DEFAULT_ALGORITHM_OUTPUT_IMAGES_PATH = Path("../output_teams/factorizer/images/")
+DEFAULT_ALGORITHM_OUTPUT_FILE_PATH = Path("../output_teams/factorizer/results.json")
 
 
 # todo change with your team-name
@@ -53,12 +53,6 @@ class Factorizer:
             input_data["flair_image"],
         )
 
-        # Get all json inputs.
-        dwi_json, adc_json, flair_json = (
-            input_data["dwi_json"],
-            input_data["adc_json"],
-            input_data["flair_json"],
-        )
 
         ################################################################################################################
         #################################### Beginning of your prediction method. ######################################
@@ -81,7 +75,7 @@ class Factorizer:
         prediction = self.predict(input_data)  # function you need to update!
 
         # Build the itk object.
-        output_image = sitk.GetImageFromArray(prediction)
+        output_image = sitk.GetImageFromArray(prediction.astype(np.uint8))
         output_image.SetOrigin(origin), output_image.SetSpacing(
             spacing
         ), output_image.SetDirection(direction)
@@ -129,25 +123,12 @@ class Factorizer:
             slug="flair-brain-mri", filetype="image"
         )
 
-        # Get MR metadata paths.
-        dwi_json_path = self.get_file_path(
-            slug="dwi-mri-acquisition-parameters", filetype="json"
-        )
-        adc_json_path = self.get_file_path(
-            slug="adc-mri-parameters", filetype="json"
-        )
-        flair_json_path = self.get_file_path(
-            slug="flair-mri-acquisition-parameters", filetype="json"
-        )
 
         input_data = {
             "dwi_image": sitk.ReadImage(str(dwi_image_path)),
-            "dwi_json": json.load(open(dwi_json_path)),
             "adc_image": sitk.ReadImage(str(adc_image_path)),
-            "adc_json": json.load(open(adc_json_path)),
-            "flair_image": sitk.ReadImage(str(flair_image_path)),
-            "flair_json": json.load(open(flair_json_path)),
-        }
+            "flair_image": sitk.ReadImage(str(flair_image_path))
+                    }
 
         # Set input information.
         input_filename = str(dwi_image_path).split("/")[-1]
@@ -158,7 +139,7 @@ class Factorizer:
 
         if filetype == "image":
             file_list = list(
-                (self._input_path / "images" / slug).glob("*.mha")
+                (self._input_path / "images" / slug).glob("*.nii.gz")
             )
         elif filetype == "json":
             file_list = list(self._input_path.glob("*{}.json".format(slug)))

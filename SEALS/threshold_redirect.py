@@ -6,6 +6,7 @@ import argparse
 import numpy as np
 from glob import glob
 import SimpleITK as sitk
+import shutil
 
 def json_writer(json_path, data):
     with open(str(json_path), "w") as f:
@@ -22,9 +23,9 @@ class ISLES22():
         adc_folder    = 'adc-brain-mri'
         flair_folder  = 'flair-brain-mri'
 
-        self.dwi_path   = glob(os.path.join(self.root, dwi_folder, '*.mha'))[0]
-        self.adc_path   = glob(os.path.join(self.root, adc_folder, '*.mha'))[0]
-        self.flair_path = glob(os.path.join(self.root, flair_folder, '*.mha'))[0]
+        self.dwi_path   = glob(os.path.join(self.root, dwi_folder, '*.nii.gz'))[0]
+        self.adc_path   = glob(os.path.join(self.root, adc_folder, '*.nii.gz'))[0]
+        self.flair_path = glob(os.path.join(self.root, flair_folder, '*.nii.gz'))[0]
 
 def reimplement_resize(image_file, target_file, resample_method=sitk.sitkLinear):
     """
@@ -34,7 +35,6 @@ def reimplement_resize(image_file, target_file, resample_method=sitk.sitkLinear)
     :resample_method: SimpleITK resample method (e.g. SimpleITK.sitkLinear, SimpleITK.sitkNearestNeighbor)
     :return: resampled_image_file: sitk.SimpleITK.Image
     """
-    # pdb.set_trace()
     if isinstance(image_file, str):
         image_file = sitk.ReadImage(image_file)
     elif isinstance(image_file, np.ndarray):
@@ -89,7 +89,7 @@ if __name__=='__main__':
         os.makedirs(output_folder)
 
     # load origin mha file path
-    raw_data_dir = '/input/images'
+    raw_data_dir = '../input/images'
     dataset_ISLES22 = ISLES22(raw_data_dir)
     dataset_ISLES22.load_data()
 
@@ -98,7 +98,7 @@ if __name__=='__main__':
 
     # load prediction
     try:
-        pred_file = glob(os.path.join(input_folder, '*.mha'))[0]
+        pred_file = glob(os.path.join(input_folder, '*.nii.gz'))[0]
         pred_image = sitk.ReadImage(pred_file)
     except:
         print('no prediction! generating full 0 mask!')
@@ -124,3 +124,9 @@ if __name__=='__main__':
                                     filename=str(dataset_ISLES22.dwi_path.split('/')[-1]))]}
     case_results.append(json_result)
     json_writer(os.path.join(output_folder, 'result.json'), case_results)
+    
+    # Clean intermediate files
+    shutil.rmtree('test_result')
+    shutil.rmtree('test_ensemble')
+    shutil.rmtree('test_result_recover')
+

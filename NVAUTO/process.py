@@ -21,19 +21,11 @@ import sys
 sys.path.append('.')
 
 
-DEFAULT_INPUT_PATH = Path("/input")
-DEFAULT_ALGORITHM_OUTPUT_IMAGES_PATH = Path("/output_teams/nvauto/images/")
-DEFAULT_ALGORITHM_OUTPUT_FILE_PATH = Path("/output_teams/nvauto/results.json")
+DEFAULT_INPUT_PATH = Path("../input")
+DEFAULT_ALGORITHM_OUTPUT_IMAGES_PATH = Path("../output_teams/nvauto/images/")
+DEFAULT_ALGORITHM_OUTPUT_FILE_PATH = Path("../output_teams/nvauto/results.json")
 
 
-
-# class LoadSimpleITK(transforms.MapTransform):
-#     def __call__(self, data):
-#         image = data['image']
-#         image = SimpleITK.ReadImage(image)
-#         image = np.asarray(SimpleITK.GetArrayFromImage(image))
-#         data['image'] = image
-#         return data
 
 
 # todo change with your team-name
@@ -64,7 +56,7 @@ class ThresholdModel():
         """
         Input   input_data, dict.
                 The dictionary contains 3 images and 3 json files.
-                keys:  'dwi_image' , 'adc_image', 'flair_image', 'dwi_json', 'adc_json', 'flair_json'
+                keys:  'dwi_image' , 'adc_image', 'flair_image'
 
         Output  prediction, array.
                 Binary mask encoding the lesion segmentation (0 background, 1 foreground).
@@ -79,10 +71,6 @@ class ThresholdModel():
                                                             input_data['adc_image_path'],\
                                                             input_data['flair_image_path']
 
-        # Get all json inputs.
-        dwi_json, adc_json, flair_json = input_data['dwi_json'],\
-                                         input_data['adc_json'],\
-                                         input_data['flair_json']
 
         ##################
 
@@ -226,7 +214,7 @@ class ThresholdModel():
         # print('dwi_image_data', dwi_image_data.shape, 'prediction', prediction.shape)
 
         # Build the itk object.
-        output_image = SimpleITK.GetImageFromArray(prediction)
+        output_image = SimpleITK.GetImageFromArray(prediction.astype(np.uint8))
         output_image.SetOrigin(origin), output_image.SetSpacing(spacing), output_image.SetDirection(direction)
 
         # Write segmentation to output location.
@@ -255,19 +243,10 @@ class ThresholdModel():
         adc_image_path = self.get_file_path(slug='adc-brain-mri', filetype='image')
         flair_image_path = self.get_file_path(slug='flair-brain-mri', filetype='image')
 
-        # Get MR metadata paths.
-        dwi_json_path = self.get_file_path(slug='dwi-mri-acquisition-parameters', filetype='json')
-        adc_json_path = self.get_file_path(slug='adc-mri-parameters', filetype='json')
-        flair_json_path = self.get_file_path(slug='flair-mri-acquisition-parameters', filetype='json')
 
-        # input_data = {'dwi_image': SimpleITK.ReadImage(str(dwi_image_path)), 'dwi_json': json.load(open(dwi_json_path)),
-        #               'adc_image': SimpleITK.ReadImage(str(adc_image_path)), 'adc_json': json.load(open(adc_json_path)),
-        #               'flair_image': SimpleITK.ReadImage(str(flair_image_path)), 'flair_json': json.load(open(flair_json_path))}
-
-
-        input_data = {'dwi_image': SimpleITK.ReadImage(str(dwi_image_path)), 'dwi_image_path': str(dwi_image_path), 'dwi_json': json.load(open(dwi_json_path)),
-                      'adc_image': SimpleITK.ReadImage(str(adc_image_path)), 'adc_image_path': str(adc_image_path), 'adc_json': json.load(open(adc_json_path)),
-                      'flair_image': SimpleITK.ReadImage(str(flair_image_path)), 'flair_image_path': str(flair_image_path), 'flair_json': json.load(open(flair_json_path))}
+        input_data = {'dwi_image': SimpleITK.ReadImage(str(dwi_image_path)), 'dwi_image_path': str(dwi_image_path), 
+                      'adc_image': SimpleITK.ReadImage(str(adc_image_path)), 'adc_image_path': str(adc_image_path),
+                      'flair_image': SimpleITK.ReadImage(str(flair_image_path)), 'flair_image_path': str(flair_image_path)}
 
 
         # Set input information.
@@ -278,7 +257,7 @@ class ThresholdModel():
         """ Gets the path for each MR image/json file."""
 
         if filetype == 'image':
-            file_list = list((self._input_path / "images" / slug).glob("*.mha"))
+            file_list = list((self._input_path / "images" / slug).glob("*.nii.gz"))
         elif filetype == 'json':
             file_list = list(self._input_path.glob("*{}.json".format(slug)))
 
