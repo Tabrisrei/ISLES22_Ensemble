@@ -11,4 +11,4 @@ cd ../FACTORIZER
 python process.py
 
 cd ..
-python major_voting.py -i /output_teams/ -o /output/images/stroke-lesion-segmentation/
+python majority_voting.py -i output_teams/ -o output/images/stroke-lesion-segmentation/
