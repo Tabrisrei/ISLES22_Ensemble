@@ -31,24 +31,12 @@ cd ~
 git clone https://github.com/Tabrisrei/ISLES22_Ensemble.git
 ```
 
-4. Run the following command to install nnUNet package requirements of SEALS.
+4. Run the following command to install package requirements of the different algorithms -SEALS, SWAN and NVAUTO-.
 
 ```bash
 cd ISLES22_Ensemble
 pip install -e SEALS/
-```
-
-5. Run the following command to install nnUNet package requirements of SEALS.
-
-```bash
-cd ISLES22_Ensemble
 pip install -e FACTORIZER/model/factorizer/
-```
-
-6. Run the following command to install MONAI package requrements of NVAUTO. It also helps check if successfully installed required package version. (nnunet installation process did not strictly determine the package version, which may raise some unpredictable error.)
-
-```bash
-cd ISLES22_Ensemble
 pip install -r requirements.txt
 ```
 
