@@ -60,18 +60,17 @@ if __name__=='__main__':
     # load image
     image_file = sitk.ReadImage(dataset_ISLES22.dwi_path)
 
-    # major voting
-
+    # majority voting
     result_array = None
     sub_folders = os.listdir(input_folder)
     for folder in sub_folders:
-        print(folder)
         try:
             pred_file = glob(os.path.join(input_folder, folder, 'images', 'stroke-lesion-segmentation', '*.nii.gz'))[0]
             pred_image = sitk.ReadImage(pred_file)
             pred_array = sitk.GetArrayFromImage(pred_image).astype(np.int8)
         except:
-            print('no prediction! generating full 0 mask!')
+            print('Error in {}'.format(folder))
+            print('Null mask is generated')
             image_array = sitk.GetArrayFromImage(image_file)
             pred_array  = np.zeros_like(image_array)
 
@@ -88,17 +87,5 @@ if __name__=='__main__':
     result_image.SetOrigin(image_file.GetOrigin())
     result_image.SetSpacing(image_file.GetSpacing())
     result_image.SetDirection(image_file.GetDirection())
-    sitk.WriteImage(result_image, os.path.join(output_folder, dataset_ISLES22.dwi_path.split('/')[-1]))
+    sitk.WriteImage(result_image, os.path.join(output_folder, 'lesion_msk.nii.gz'))
 
-    # dump the result to json file
-    case_results = []
-    json_result =   {"outputs": [dict(
-                                    type="Image", 
-                                    slug="stroke-lesion-segmentation",
-                                    filename=str(dataset_ISLES22.dwi_path.split('/')[-1]))],
-                    "inputs": [dict(
-                                    type="Image", 
-                                    slug="dwi-brain-mri",
-                                    filename=str(dataset_ISLES22.dwi_path.split('/')[-1]))]}
-    case_results.append(json_result)
-    json_writer(os.path.join(output_folder, 'result.json'), case_results)

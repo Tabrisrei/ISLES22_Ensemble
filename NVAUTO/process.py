@@ -3,20 +3,15 @@ import numpy as np
 import json
 import os
 from pathlib import Path
-
 import time, copy
 from functools import partial
-
 import torch
 from torch.cuda.amp import autocast
-
 from monai import transforms, data
-# from monai.inferers import sliding_window_inference
 from monai.metrics import compute_meandice
 from monai.networks import one_hot
 from monai.inferers import SlidingWindowInferer
 from monai.data.utils import decollate_batch
-
 import sys
 sys.path.append('.')
 
@@ -24,8 +19,6 @@ sys.path.append('.')
 DEFAULT_INPUT_PATH = Path("../input")
 DEFAULT_ALGORITHM_OUTPUT_IMAGES_PATH = Path("../output_teams/nvauto/images/")
 DEFAULT_ALGORITHM_OUTPUT_FILE_PATH = Path("../output_teams/nvauto/results.json")
-
-
 
 
 # todo change with your team-name
@@ -139,7 +132,7 @@ class ThresholdModel():
 
                 all_probs=[]
                 for checkpoint in checkpoints:
-                    print('Inference with', checkpoint)
+                    #print('Inference with', checkpoint)
               
                     model = torch.jit.load(checkpoint)
                     model.cuda(0)
@@ -193,9 +186,6 @@ class ThresholdModel():
 
         #################################### End of your prediction method. ############################################
         ################################################################################################################
-
-        # print("prediction2", prediction.shape, np.unique(prediction))
-
         return prediction.astype(int)
 
     def process_isles_case(self, input_data, input_filename):
@@ -211,8 +201,6 @@ class ThresholdModel():
         # Segment images.
         prediction = self.predict(input_data) # function you need to update!
 
-        # print('dwi_image_data', dwi_image_data.shape, 'prediction', prediction.shape)
-
         # Build the itk object.
         output_image = SimpleITK.GetImageFromArray(prediction.astype(np.uint8))
         output_image.SetOrigin(origin), output_image.SetSpacing(spacing), output_image.SetDirection(direction)
@@ -220,18 +208,8 @@ class ThresholdModel():
         # Write segmentation to output location.
         if not self._algorithm_output_path.exists():
             os.makedirs(str(self._algorithm_output_path))
-        output_image_path = self._algorithm_output_path / input_filename
+        output_image_path = os.path.join(self._algorithm_output_path, 'lesion_msk.nii.gz')
         SimpleITK.WriteImage(output_image, str(output_image_path))
-
-        # Write segmentation file to json.
-        if output_image_path.exists():
-            json_result = {"outputs": [dict(type="Image", slug="stroke-lesion-segmentation",
-                                                 filename=str(output_image_path.name))],
-                           "inputs": [dict(type="Image", slug="dwi-brain-mri",
-                                           filename=input_filename)]}
-
-            self._case_results.append(json_result)
-            self.save()
 
 
     def load_isles_case(self):

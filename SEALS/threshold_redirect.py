@@ -110,20 +110,7 @@ if __name__=='__main__':
     pred_image.SetSpacing(image_file.GetSpacing())
     pred_image.SetDirection(image_file.GetDirection())
 
-    sitk.WriteImage(pred_image, os.path.join(output_folder, dataset_ISLES22.dwi_path.split('/')[-1]))
-
-    # dump the result to json file
-    case_results = []
-    json_result =   {"outputs": [dict(
-                                    type="Image", 
-                                    slug="stroke-lesion-segmentation",
-                                    filename=str(dataset_ISLES22.dwi_path.split('/')[-1]))],
-                    "inputs": [dict(
-                                    type="Image", 
-                                    slug="dwi-brain-mri",
-                                    filename=str(dataset_ISLES22.dwi_path.split('/')[-1]))]}
-    case_results.append(json_result)
-    json_writer(os.path.join(output_folder, 'result.json'), case_results)
+    sitk.WriteImage(pred_image, os.path.join(output_folder, 'lesion_msk.nii.gz'))
     
     # Clean intermediate files
     shutil.rmtree('test_result')

@@ -83,30 +83,9 @@ class Factorizer:
         # Write segmentation to output location.
         if not self._algorithm_output_path.exists():
             os.makedirs(str(self._algorithm_output_path))
-        output_image_path = self._algorithm_output_path / input_filename
+        output_image_path = os.path.join(self._algorithm_output_path, 'lesion_msk.nii.gz')
         sitk.WriteImage(output_image, str(output_image_path))
 
-        # Write segmentation file to json.
-        if output_image_path.exists():
-            json_result = {
-                "outputs": [
-                    dict(
-                        type="Image",
-                        slug="stroke-lesion-segmentation",
-                        filename=str(output_image_path.name),
-                    )
-                ],
-                "inputs": [
-                    dict(
-                        type="Image",
-                        slug="dwi-brain-mri",
-                        filename=input_filename,
-                    )
-                ],
-            }
-
-            self._case_results.append(json_result)
-            self.save()
 
     def load_isles_case(self):
         """ Loads the 6 inputs of ISLES22 (3 MR images, 3 metadata json files accompanying each MR modality).
