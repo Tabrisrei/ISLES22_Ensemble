@@ -80,6 +80,14 @@ bash Ensemble_launcher.sh
 
 Results will be stored in `~/ISLES22_Ensemble/output/images/stroke-lesion-segmentation/`. 
 
+## Citation
+Please cite the following manuscripts when using The Isles'22 Ensemble
+
+de la Rosa, E. et al. XXX. Arxiv.
+
+Hernandez Petzsche, M. R., de la Rosa, E., Hanning, U., Wiest, R., Valenzuela, W., Reyes, M., ... & Kirschke, J. S. (2022). ISLES 2022: A multi-center magnetic resonance imaging stroke lesion segmentation dataset. Scientific data, 9(1), 762.
+
+
 ## About the Ensembled Algorithms 
 Algorithm SEALS is based on nnUnet. Git repo https://github.com/Tabrisrei/ISLES22_SEALS 
 
