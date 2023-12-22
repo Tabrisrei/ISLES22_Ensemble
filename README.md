@@ -1,4 +1,5 @@
 # The Isles'22 Ensemble Algorithm 
+![alt text]([https://github.com/ezequieldlrosa/isles22/blob/main/isles-logo.png](https://github.com/Tabrisrei/ISLES22_Ensemble/blob/master/ensemble-logo.png))
 
 ## Introduction
 Algorithm to predict ischemic stroke lesions from MRI data.
