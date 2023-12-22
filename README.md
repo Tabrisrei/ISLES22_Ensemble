@@ -1,6 +1,6 @@
-# The Isles'22 Ensemble Algorithm 
-![alt text](https://github.com/Tabrisrei/ISLES22_Ensemble/blob/master/ensemble-logo.png))
+![alt text](https://github.com/Tabrisrei/ISLES22_Ensemble/blob/master/ensemble-logo.png)
 
+# The Isles'22 Ensemble Algorithm 
 ## Introduction
 Algorithm to predict ischemic stroke lesions from MRI data.
 
@@ -9,8 +9,6 @@ The top-3 leading algorithms are used in a majority-voting scheme to predict out
 
 
 ## 1) Installation
-```
-
 1.1) In your conda environment 'myenv' (mandatory- Python version 3.8.0) install basic pytorch,、torchvision and cudatoolkit.
 
 ```bash
@@ -25,7 +23,7 @@ cd ~
 git clone https://github.com/Tabrisrei/ISLES22_Ensemble.git
 ```
 
-1.3). Install dependencies for the ensemble algorithm .
+1.3) Install dependencies for the ensemble algorithm .
 
 ```bash
 cd ISLES22_Ensemble
@@ -37,6 +35,7 @@ pip install -r requirements.txt
 If successfully installed all required packages, you can follow  the steps below to download and place the checkpoints.
 
 1.4) Download all content from (https://drive.google.com/drive/folders/1GQP5nmtoIfhyu2LHCzPVYnZZ7ZQDX1go?usp=drive_link).
+
 1.5) 
 - Decompress the file "nnUNet_trained_models.tar.gz" in `~/ISLES22_Ensemble/SEALS/data/`.
 - Decompress the file "ts.tar.gz" in `~/ISLES22_Ensemble/NVAUTO/`.
@@ -65,15 +64,14 @@ predict_ensemble(isles_ensemble_path=ENSEMBLE_PATH,
                     save_team_outputs=False)
 ```
 
-
-
-
 2.2) From terminal
-Place your MRI images (.nii.gz) in
 
-`~/ISLES22_Ensemble/input/images/adc-brain-mri/'
-`~/ISLES22_Ensemble/input/images/dwi-brain-mri/'
-`~/ISLES22_Ensemble/input/images/flair-brain-mri/'
+Place your MRI images (.nii.gz) in
+```bash
+~/ISLES22_Ensemble/input/images/adc-brain-mri/
+~/ISLES22_Ensemble/input/images/dwi-brain-mri/
+~/ISLES22_Ensemble/input/images/flair-brain-mri/
+```
 
 Run: 
 ```bash
@@ -84,7 +82,9 @@ Results will be stored in `~/ISLES22_Ensemble/output/images/stroke-lesion-segmen
 
 ## About the Ensembled Algorithms 
 Algorithm SEALS is based on nnUnet. Git repo https://github.com/Tabrisrei/ISLES22_SEALS 
+
 Algorithm NVAUTO is based on MONAI Auto3dseg. Git repo: https://github.com/mahfuzmohammad/isles22
+
 Algorithm SWAN is based on FACTORIZER. Git repo: https://github.com/pashtari/factorizer-isles22
 
 
