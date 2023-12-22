@@ -1,37 +1,30 @@
-# MICCAI Ischemic Stroke LEsion Segmentation 2022 Top 3 Major Voting Ensemble
+# The Isles'22 Ensemble Algorithm 
 
 ## Introduction
+Algorithm to predict ischemic stroke lesions from MRI data.
 
-This is the repository of Top3 team SEALS/NVAUTO/SWAN final algorithm major voting for MICCAI ISLES22 competition. If you are interested in our work, please cite 《XXX》
+This repository contains an ensemble algorithm devised in the context of the ISLES'22 MICCAI Challenge (https://isles22.grand-challenge.org/).
+The top-3 leading algorithms are used in a majority-voting scheme to predict outputs.
 
-## Usage
 
-This repository is based on nnUNet/MONAI/FACTORIZER. Please follow the installation instruction below. We recommend to install required packages under conda environment.
-
-## Installation
-
-If you do not want to install conda, please skip to the step 3.
-
-1. Let us hypothesis you are using conda environment named "isles", activate conda environment "isles"
-
-```bash
-conda activate isles
+## 1) Installation
 ```
 
-2. Run the following command to install basic pytorch、torchvision library and corresponding cudatoolkit.
+1.1) In your conda environment 'myenv' (mandatory- Python version 3.8.0) install basic pytorch,、torchvision and cudatoolkit.
 
 ```bash
+conda activate myenv
 conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=11.3 -c pytorch
 ```
 
-3. Clone this repository.
+1.2) Clone this repository.
 
 ```bash
 cd ~
 git clone https://github.com/Tabrisrei/ISLES22_Ensemble.git
 ```
 
-4. Run the following command to install package requirements of the different algorithms -SEALS, SWAN and NVAUTO-.
+1.3). Install dependencies for the ensemble algorithm .
 
 ```bash
 cd ISLES22_Ensemble
@@ -42,31 +35,63 @@ pip install -r requirements.txt
 
 If successfully installed all required packages, you can follow  the steps below to download and place the checkpoints.
 
-5. Download zip files of top3 models from [Google Drive](https://drive.google.com/drive/folders/1GQP5nmtoIfhyu2LHCzPVYnZZ7ZQDX1go?usp=drive_link), there are 3 compressed files in it: "nnUNet_trained_models.tar.gz", "ts.tar.gz" and "log.tar.gz".
-6. Decompression the "nnUNet_trained_models.tar.gz" file and put the "nnUNet_trained_models" folder you've got into the directory `~/ISLES22_Ensemble/SEALS/data/`.
-7. Decompression the "ts.tar.gz" file and put the "ts" folder you've got into the directory `~/ISLES22_Ensemble/NVAUTO/`.
-8. Decompression the "log.tar.gz" file and put the "log" folder you've got into the directory `~/ISLES22_Ensemble/FACTORIZER/model/`.
+1.4) Download all content from (https://drive.google.com/drive/folders/1GQP5nmtoIfhyu2LHCzPVYnZZ7ZQDX1go?usp=drive_link).
+1.5) 
+- Decompress the file "nnUNet_trained_models.tar.gz" in `~/ISLES22_Ensemble/SEALS/data/`.
+- Decompress the file "ts.tar.gz" in `~/ISLES22_Ensemble/NVAUTO/`.
+- Decompress "log.tar.gz" in `~/ISLES22_Ensemble/FACTORIZER/model/`.
 
-Now we have prepared all the required code and models, you can follow the steps below to test your own dataset. 
 
-9. Convert your dwi and adc image to mha format (Do not forget metadata)
-10. Put your dwi and adc data into `/input/images/dwi-brain-mri/` and `/input/images/adc-brain-mri/` folder respectively.
-11. Run the following command to generate the results.
+## 2) Usage
+2.1) From Python
 
+```bash
+import sys
+ENSEMBLE_PATH = 'path-to-isles-ensemble-repo/' 
+sys.path.append(ENSEMBLE_PATH)
+from isles22_ensemble import predict_ensemble
+
+INPUT_FLAIR = 'path-to-flair.nii.gz'
+INPUT_ADC = 'path-to-adc.nii.gz'
+INPUT_DWI = 'path-to-dwi.nii.gz'
+OUTPUT_PATH = 'path-to-output-folder'
+
+predict_ensemble(isles_ensemble_path=ENSEMBLE_PATH,
+                     input_dwi_path=INPUT_DWI,
+                    input_adc_path=INPUT_ADC,
+                    input_flair_path=INPUT_FLAIR,
+                    output_path=OUTPUT_PATH,
+                    save_team_outputs=False)
+```
+
+
+
+
+2.2) From terminal
+Place your MRI images (.nii.gz) in
+
+`~/ISLES22_Ensemble/input/images/adc-brain-mri/'
+`~/ISLES22_Ensemble/input/images/dwi-brain-mri/'
+`~/ISLES22_Ensemble/input/images/flair-brain-mri/'
+
+Run: 
 ```bash
 bash Ensemble_launcher.sh
 ```
 
-After the results are generated, you can check the results in `/output/images/stroke-lesion-segmentation/` folder.
+Results will be stored in `~/ISLES22_Ensemble/output/images/stroke-lesion-segmentation/`. 
+
+## About the Ensembled Algorithms 
+Algorithm SEALS is based on nnUnet. Git repo https://github.com/Tabrisrei/ISLES22_SEALS 
+Algorithm NVAUTO is based on MONAI Auto3dseg. Git repo: https://github.com/mahfuzmohammad/isles22
+Algorithm SWAN is based on FACTORIZER. Git repo: https://github.com/pashtari/factorizer-isles22
+
 
 ## Questions
-
-Please contact gtabris@buaa.edu.cn or ezequiel.delarosa@icometrix.com
+Please contact Shengbo Gao (gtabris@buaa.edu.cn) or Ezequiel de la Rosa (ezequiel.delarosa@icometrix.com)
 
 ## Acknowledgement
 
 - The code of Team SEALS is adapted from [nnUNet](https://github.com/MIC-DKFZ/nnUNet), We thank Dr. Fabian Isensee etc. for their elegant and efficient code base.
 - The code of NVAUTO is adapted from [MONAI](https://github.com/Project-MONAI/MONAI)
 - The code of SWAN is adapted from [FACTORIZER](https://github.com/pashtari/factorizer)
-
-Thanks for your interest in our work. If you have any questions, please feel free to contact us.
