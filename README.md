@@ -34,7 +34,7 @@ pip install -r requirements.txt
 
 If successfully installed all required packages, you can follow  the steps below to download and place the checkpoints.
 
-1.4) Download all content from (https://drive.google.com/drive/folders/1GQP5nmtoIfhyu2LHCzPVYnZZ7ZQDX1go?usp=drive_link).
+1.4) Download all content from https://drive.google.com/drive/folders/1GQP5nmtoIfhyu2LHCzPVYnZZ7ZQDX1go?usp=drive_link
 
 1.5) 
 - Decompress the file "nnUNet_trained_models.tar.gz" in `~/ISLES22_Ensemble/SEALS/data/`.
