@@ -100,7 +100,7 @@ Algorithm SWAN is based on FACTORIZER. Git repo: https://github.com/pashtari/fac
 Please contact Shengbo Gao (gtabris@buaa.edu.cn) or Ezequiel de la Rosa (ezequiel.delarosa@icometrix.com)
 
 ## Acknowledgement
-
-- The code of Team SEALS is adapted from [nnUNet](https://github.com/MIC-DKFZ/nnUNet), We thank Dr. Fabian Isensee etc. for their elegant and efficient code base.
+We thank all ISLES'22 challenge participants, collaborators and organizers for allowing this work to happen. We also thank all developers and maintaners of the repositories named below for sharing such valuable resources.
+- The code of Team SEALS is adapted from [nnUNet](https://github.com/MIC-DKFZ/nnUNet). 
 - The code of NVAUTO is adapted from [MONAI](https://github.com/Project-MONAI/MONAI)
 - The code of SWAN is adapted from [FACTORIZER](https://github.com/pashtari/factorizer)
