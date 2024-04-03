@@ -53,7 +53,7 @@ The algorithms works over **skull-stripped MRI images**, directly in native-spac
 
 ```bash
 import sys
-ENSEMBLE_PATH = 'path-to-isles-ensemble-repo/' 
+ENSEMBLE_PATH = 'path-to-isles-ensemble-repo' 
 sys.path.append(ENSEMBLE_PATH)
 from isles22_ensemble import predict_ensemble
 
