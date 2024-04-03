@@ -89,21 +89,21 @@ Results will be stored in `~/ISLES22_Ensemble/output/images/stroke-lesion-segmen
 ## Citation
 Please cite the following manuscripts when using The Isles'22 Ensemble
 
-  de la Rosa, E., Reyes, M., Liew, S. L., Hutton, A., Wiest, R., Kaesmacher, J., ... & Wiestler, B. (2024). A Robust Ensemble Algorithm for Ischemic Stroke Lesion Segmentation: Generalizability and Clinical Utility Beyond the ISLES Challenge. arXiv preprint arXiv:2403.19425.
+* de la Rosa, E., Reyes, M., Liew, S. L., Hutton, A., Wiest, R., Kaesmacher, J., ... & Wiestler, B. (2024). A Robust Ensemble Algorithm for Ischemic Stroke Lesion Segmentation: Generalizability and Clinical Utility Beyond the ISLES Challenge. arXiv preprint arXiv:2403.19425.
 
-  Hernandez Petzsche, M. R., de la Rosa, E., Hanning, U., Wiest, R., Valenzuela, W., Reyes, M., ... & Kirschke, J. S. (2022). ISLES 2022: A multi-center magnetic resonance imaging stroke lesion segmentation dataset. Scientific data, 9(1), 762.
+* Hernandez Petzsche, M. R., de la Rosa, E., Hanning, U., Wiest, R., Valenzuela, W., Reyes, M., ... & Kirschke, J. S. (2022). ISLES 2022: A multi-center magnetic resonance imaging stroke lesion segmentation dataset. Scientific data, 9(1), 762.
 
 
 ## About the Ensembled Algorithms 
-Algorithm SEALS is based on nnUnet. Git repo https://github.com/Tabrisrei/ISLES22_SEALS 
+* Algorithm SEALS is based on nnUnet. Git repo https://github.com/Tabrisrei/ISLES22_SEALS 
 
-Algorithm NVAUTO is based on MONAI Auto3dseg. Git repo: https://github.com/mahfuzmohammad/isles22
+* Algorithm NVAUTO is based on MONAI Auto3dseg. Git repo: https://github.com/mahfuzmohammad/isles22
 
-Algorithm SWAN is based on FACTORIZER. Git repo: https://github.com/pashtari/factorizer-isles22
+* Algorithm SWAN is based on FACTORIZER. Git repo: https://github.com/pashtari/factorizer-isles22
 
 
 ## Questions
-Please contact Shengbo Gao (gtabris@buaa.edu.cn) or Ezequiel de la Rosa (ezequiel.delarosa@icometrix.com)
+Please contact Ezequiel de la Rosa (ezequiel.delarosa@uzh.ch) or Shengbo Gao (gtabris@buaa.edu.cn).
 
 ## Acknowledgement
 We thank all ISLES'22 challenge participants, collaborators and organizers for allowing this work to happen. We also thank all developers and maintaners of the repositories named below for sharing such valuable resources.
