@@ -10,6 +10,7 @@ The top-3 leading algorithms are used in a majority-voting scheme to predict out
 
 ## 1) Installation
 1.1) In your conda environment 'myenv' install basic pytorch, torchvision and cudatoolkit.
+
 **Note: Mandatory Python version 3.8.0**
 
 ```bash
