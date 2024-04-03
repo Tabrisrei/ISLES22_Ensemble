@@ -64,7 +64,7 @@ def predict(isles_ensemble_path, input_dwi_path):
     # Contact person: Shengbo Gao (GTabris@buaa.edu.cn)
      
     print_run('SEALS')
-    path_seals = isles_ensemble_path + 'SEALS/'
+    path_seals = isles_ensemble_path + '/SEALS/'
     command_seals = path_seals
     command_seals += f'nnunet_launcher.sh'
     subprocess.run(command_seals, shell=True, cwd=path_seals)
@@ -73,7 +73,7 @@ def predict(isles_ensemble_path, input_dwi_path):
     # Contact person: Md Mahfuzur Rahman Siddiquee (mrahmans@asu.edu)
     
     print_run('NVAUTO')
-    path_nvauto = isles_ensemble_path + 'NVAUTO/'
+    path_nvauto = isles_ensemble_path + '/NVAUTO/'
     command_nvauto = f'python process.py'
     subprocess.run(command_nvauto, shell=True, cwd=path_nvauto)
 
@@ -81,24 +81,24 @@ def predict(isles_ensemble_path, input_dwi_path):
     # Contact person: Pooya Ashtari (pooya.ashtari@esat.kuleuven.be)
 
     print_run('SWAN')
-    path_factorizer = isles_ensemble_path + 'FACTORIZER/'
+    path_factorizer = isles_ensemble_path + '/FACTORIZER/'
     command_factorizer = f'python process.py'
     subprocess.run(command_factorizer, shell=True, cwd=path_factorizer)
 
     # Ensembling results.
 
-    print_run('majority voting')
+    print_run('Majority voting')
     path_voting = isles_ensemble_path
     command_voting = f'python majority_voting.py -i output_teams/ -o output/images/stroke-lesion-segmentation/'
     subprocess.call(command_voting, shell=True, cwd=path_voting)
     print('Finished: ', input_dwi_path)
-    print("#####################################")
-    print("#####################################")
+    print('#########################################################')
+    print('#########################################################')
     print("If you are using The Isles'22 Ensemble algorithm, please cite the following work:")
-    print("de la Rosa et al. BLABLABLA. arXiv preprint 2023.")
-    print("#####################################")
-    print("#####################################")
-
+    print("""de la Rosa, E. et al. (2024) A Robust Ensemble Algorithm for Ischemic Stroke Lesion Segmentation:
+          Generalizability and Clinical Utility Beyond the ISLES Challenge. arXiv:2403.19425.""")
+    print('#########################################################')
+    print('#########################################################')
 
 
 
