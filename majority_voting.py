@@ -62,28 +62,34 @@ if __name__=='__main__':
 
     # majority voting
     result_array = None
-    sub_folders = os.listdir(input_folder)
-    for folder in sub_folders:
+    #sub_folders = os.listdir(input_folder)
+    teams = ['seals', 'nvauto', 'factorizer']
+    pred_array = {}
+    for folder in teams :
         try:
             pred_file = glob(os.path.join(input_folder, folder, 'images', 'stroke-lesion-segmentation', '*.nii.gz'))[0]
             pred_image = sitk.ReadImage(pred_file)
-            pred_array = sitk.GetArrayFromImage(pred_image).astype(np.int8)
+            pred_array[folder] = sitk.GetArrayFromImage(pred_image).astype(np.int8)
         except:
             print('Error in {}'.format(folder))
-            print('Null mask is generated')
-            image_array = sitk.GetArrayFromImage(image_file)
-            pred_array  = np.zeros_like(image_array)
 
+    # majority voting - all outputs available
+    if all(key in pred_array for key in teams):
+        result_array = pred_array['seals'] + pred_array['nvauto'] + pred_array['factorizer']
+        result_array = result_array/3 > 0.5
+    # backup- if one algorithm fails, return results from the available best-ranked team.
+    elif 'seals' in pred_array.keys():
+        result_array = pred_array['seals']
+        print('At least one algorithm failed. Returning results from SEALS.')
+    elif 'nvauto' in pred_array.keys():
+        result_array = pred_array['nvauto']
+        print('At least one algorithm failed. Returning results from NVAUTO.')
+    else:
+        result_array = pred_array['factorizer']
+        print('At least one algorithm failed. Returning results from FACTORIZER.')
 
-        if result_array is None:
-            result_array = pred_array.copy()
-        else:
-            result_array += np.asarray(pred_array)
-
-    result_array = result_array/3 > 0.5 #
+    # Write results
     result_image = sitk.GetImageFromArray(result_array.astype(np.uint8))
-
-        
     result_image.SetOrigin(image_file.GetOrigin())
     result_image.SetSpacing(image_file.GetSpacing())
     result_image.SetDirection(image_file.GetDirection())
