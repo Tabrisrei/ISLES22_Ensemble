@@ -7,7 +7,7 @@ Algorithm to predict ischemic stroke lesions from MRI data.
 This repository contains an ensemble algorithm devised in the context of the ISLES'22 MICCAI Challenge (https://isles22.grand-challenge.org/).
 The top-3 leading algorithms are used in a majority-voting scheme to predict outputs.
 
-1. [Installation](#1)-installation)
+1. [Installation](#installation)
 2. [Usage](#usage)
 3. [Get started](#get-started)
 4. [Citation](#citation)
@@ -117,7 +117,7 @@ Please cite the following manuscripts when using The Isles'22 Ensemble:
 ## Questions
 Please contact Ezequiel de la Rosa (ezequiel.delarosa@uzh.ch) or Shengbo Gao (gtabris@buaa.edu.cn).
 
-## 6) Acknowledgement
+## Acknowledgement
 We thank all ISLES'22 challenge participants, collaborators and organizers for allowing this work to happen. We also thank all developers and maintaners of the repositories named below for sharing such valuable resources.
 - The code of Team SEALS is adapted from [nnUNet](https://github.com/MIC-DKFZ/nnUNet). 
 - The code of NVAUTO is adapted from [MONAI](https://github.com/Project-MONAI/MONAI)
