@@ -45,7 +45,9 @@ If successfully installed all required packages, you can follow  the steps below
 
 
 ## 2) Usage
-The algorithms works over skull-stripped MRI images, directly in native-space (no image co-registration is needed). Image modalities required for running the algorithm are DWI (b=1000), ADC and FLAIR.
+The algorithms works over **skull-stripped MRI images**, directly in native-space (no image co-registration is needed). Image modalities required for running the algorithm are DWI (b=1000), ADC and FLAIR. 
+
+**Note: DWI and ADC images are supposed to be obtained from the same acquisition timepoint. Differences between them (e.g. affine, voxel resolution, number of voxels, etc.) might impact the algorithm performance.**
 
 2.1) From Python
 
