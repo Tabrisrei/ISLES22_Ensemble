@@ -88,10 +88,10 @@ Results will be stored in `~/ISLES22_Ensemble/output/images/stroke-lesion-segmen
 
 ## 3) Get started 
 You can try out our algorithm using a real test scan located in `~/data`. For doing so, run the example script located in `~/scripts/predict_scan.py`.
-The data example data belongs to the ISLES'22 dataset (Hernandez Petzsche et al., Sci Data 2022).
+The example data belongs to the ISLES'22 dataset (Hernandez Petzsche et al., Sci Data 2022).
 
 ## 4) Citation
-Please cite the following manuscripts when using The Isles'22 Ensemble
+Please cite the following manuscripts when using The Isles'22 Ensemble:
 
 * de la Rosa, E., Reyes, M., Liew, S. L., Hutton, A., Wiest, R., Kaesmacher, J., ... & Wiestler, B. (2024). A Robust Ensemble Algorithm for Ischemic Stroke Lesion Segmentation: Generalizability and Clinical Utility Beyond the ISLES Challenge. arXiv preprint arXiv:2403.19425.
 
