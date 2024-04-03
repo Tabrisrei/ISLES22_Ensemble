@@ -7,6 +7,15 @@ Algorithm to predict ischemic stroke lesions from MRI data.
 This repository contains an ensemble algorithm devised in the context of the ISLES'22 MICCAI Challenge (https://isles22.grand-challenge.org/).
 The top-3 leading algorithms are used in a majority-voting scheme to predict outputs.
 
+1. [Introduction](#introduction)
+2. [Installation](#installation)
+3. [Usage](#usage)
+4. [Get started](#get-started)
+5. [Citation](#citation)
+6. [About the Ensembled Algorithms](#about-the-ensembled-algorithms)
+7. [Questions](#questions)
+8. [Acknowledgement](#acknowledgement)
+
 
 ## 1) Installation
 1.1) In your conda environment 'myenv' install basic pytorch, torchvision and cudatoolkit.
