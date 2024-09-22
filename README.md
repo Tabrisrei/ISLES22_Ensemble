@@ -27,11 +27,11 @@ git clone https://github.com/Tabrisrei/ISLES22_Ensemble.git
 **Note: Mandatory Python version 3.8.0 (!)**
 
 ```bash
-conda create --name isles_ensemble python=3.8.0
+conda create --name isles_ensemble python=3.8.0 pip=23.3.1
 conda activate isles_ensemble
 conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=11.3 -c pytorch
-conda install python=3.8.0 # important, since pytorch triggers the installation of later python versions
 conda install -c conda-forge openslide-python
+conda install python=3.8.0 # important, since pytorch triggers the installation of later python versions
 ```
 
 1.3) Install dependencies for the ensemble algorithm .
