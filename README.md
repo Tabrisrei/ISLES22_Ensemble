@@ -17,20 +17,21 @@ The top-3 leading algorithms are used in a majority-voting scheme to predict out
 
 
 ## Installation
-1.1) In your conda environment 'myenv' install basic pytorch, torchvision and cudatoolkit.
-
-**Note: Mandatory Python version 3.8.0**
+1.1) Clone this repository.
 
 ```bash
-conda activate myenv
-conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=11.3 -c pytorch
+git clone https://github.com/Tabrisrei/ISLES22_Ensemble.git
 ```
 
-1.2) Clone this repository.
+1.2) Create conda environment and install dependencies. 
+**Note: Mandatory Python version 3.8.0 (!)**
 
 ```bash
-cd ~
-git clone https://github.com/Tabrisrei/ISLES22_Ensemble.git
+conda create --name isles_ensemble python=3.8.0
+conda activate isles_ensemble
+conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=11.3 -c pytorch
+conda install python=3.8.0 # important, since pytorch triggers the installation of later python versions
+conda install -c conda-forge openslide-python
 ```
 
 1.3) Install dependencies for the ensemble algorithm .
