@@ -110,11 +110,11 @@ Please cite the following manuscripts when using The Isles'22 Ensemble:
 
 
 ## About the Ensembled Algorithms 
-* Algorithm SEALS is based on nnUnet. Git repo https://github.com/Tabrisrei/ISLES22_SEALS 
+* Algorithm SEALS is based on nnUnet. Git [repo](https://github.com/Tabrisrei/ISLES22_SEALS) 
 
-* Algorithm NVAUTO is based on MONAI Auto3dseg. Git repo: https://github.com/mahfuzmohammad/isles22
+* Algorithm NVAUTO is based on MONAI Auto3dseg. Git [repo](https://github.com/mahfuzmohammad/isles22)
 
-* Algorithm SWAN is based on FACTORIZER. Git repo: https://github.com/pashtari/factorizer-isles22
+* Algorithm SWAN is based on FACTORIZER. Git [repo](https://github.com/pashtari/factorizer-isles22)
 
 
 ## Questions
