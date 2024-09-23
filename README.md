@@ -42,15 +42,17 @@ If successfully installed all required packages, you can follow  the steps below
 
 1.3) Download the model weights from [here](https://drive.google.com/drive/folders/1_NqCVS88coFdkzYPzOapVKlhmdqKOhqK?zx=67gokxezdc8f) and decompress the file.
 Your directory shoul look like:
+```
 
 ISLES22_Ensemble/
 ├── weights/
 │   ├── SEALS/
-│   │   └── (...) 
+│   │   └── (...)
 │   ├── NVAUTO/
-│   │   └── (...) 
+│   │   └── (...)
 │   └── FACTORIZER/
 │       └── (...)
+```
 
 
 ## Usage
