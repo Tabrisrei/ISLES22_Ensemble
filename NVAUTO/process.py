@@ -73,7 +73,6 @@ class ThresholdModel():
         val_transform = transforms.Compose(val_transform)
 
         validation_files = [{"image": [adc_image_path, dwi_image_path]}]
-        print( 'inference on files', len(validation_files), __file__)
         #dirname = os.path.dirname(__file__)
         dirname = os.path.dirname(os.getcwd())
         val_ds = data.Dataset(data=validation_files, transform=val_transform)
