@@ -66,8 +66,6 @@ class ThresholdModel():
 
 
         ##################
-
-
         np.set_printoptions(formatter={'float': '{: 0.3f}'.format}, suppress=True)
         torch.cuda.set_device(0)
         torch.backends.cudnn.benchmark = True
@@ -87,43 +85,41 @@ class ThresholdModel():
         val_transform = transforms.Compose(val_transform)
 
         validation_files = [{"image": [adc_image_path, dwi_image_path]}]
-
-
         print( 'inference on files', len(validation_files), __file__)
-        dirname = os.path.dirname(__file__)
-
+        #dirname = os.path.dirname(__file__)
+        dirname = os.path.dirname(os.getcwd())
         val_ds = data.Dataset(data=validation_files, transform=val_transform)
         val_loader = data.DataLoader(val_ds, batch_size=1, shuffle=False, num_workers=0, sampler=None)
 
 
-        checkpoints = [ os.path.join(dirname, 'ts/model0.ts'),
-                        os.path.join(dirname, 'ts/model1.ts'),
-                        os.path.join(dirname, 'ts/model2.ts'),
+        checkpoints = [ os.path.join(dirname, 'weights/NVAUTO/ts/model0.ts'),
+                        os.path.join(dirname, 'weights/NVAUTO/ts/model1.ts'),
+                        os.path.join(dirname, 'weights/NVAUTO/ts/model2.ts'),
 
-                        os.path.join(dirname, 'ts/model3.ts'),
-                        os.path.join(dirname, 'ts/model4.ts'),
-                        os.path.join(dirname, 'ts/model5.ts'),
+                        os.path.join(dirname, 'weights/NVAUTO/ts/model3.ts'),
+                        os.path.join(dirname, 'weights/NVAUTO/ts/model4.ts'),
+                        os.path.join(dirname, 'weights/NVAUTO/ts/model5.ts'),
 
-                        os.path.join(dirname, 'ts/model6.ts'),
-                        os.path.join(dirname, 'ts/model7.ts'),
-                        os.path.join(dirname, 'ts/model8.ts'),
+                        os.path.join(dirname, 'weights/NVAUTO/ts/model6.ts'),
+                        os.path.join(dirname, 'weights/NVAUTO/ts/model7.ts'),
+                        os.path.join(dirname, 'weights/NVAUTO/ts/model8.ts'),
 
-                        os.path.join(dirname, 'ts/model9.ts'),
-                        os.path.join(dirname, 'ts/model10.ts'),
-                        os.path.join(dirname, 'ts/model11.ts'),
+                        os.path.join(dirname, 'weights/NVAUTO/ts/model9.ts'),
+                        os.path.join(dirname, 'weights/NVAUTO/ts/model10.ts'),
+                        os.path.join(dirname, 'weights/NVAUTO/ts/model11.ts'),
 
-                        os.path.join(dirname, 'ts/model12.ts'),
-                        os.path.join(dirname, 'ts/model13.ts'),
-                        os.path.join(dirname, 'ts/model14.ts'),
+                        os.path.join(dirname, 'weights/NVAUTO/ts/model12.ts'),
+                        os.path.join(dirname, 'weights/NVAUTO/ts/model13.ts'),
+                        os.path.join(dirname, 'weights/NVAUTO/ts/model14.ts'),
 
                         ]
 
 
-        n_classes = 2
-        in_channels=2
-        accuracy=0
-        start_time = time.time()
-        validation_files_copy = copy.deepcopy(validation_files)
+        #n_classes = 2
+        #in_channels=2
+        #accuracy=0
+        #start_time = time.time()
+        #validation_files_copy = copy.deepcopy(validation_files)
         model_inferer = SlidingWindowInferer(roi_size=[192, 192, 128], overlap=0.625, mode='gaussian', cache_roi_weight_map=True, sw_batch_size=2)
 
         with torch.no_grad():
@@ -157,35 +153,8 @@ class ThresholdModel():
 
                 prediction = labels[0].copy()
 
-                # case_name = validation_files_copy[idx]['image'][0].split('/')[-1] #output casename
-                # print('for output case name', case_name)
-
-                # print('Inference {}/{}'.format(idx, len(val_loader)), case_name,  'time {:.2f}s'.format(time.time() - start_time))
-
-                # if args.results_folder is not None:
-                #     labels = torch.argmax(probs, dim=1).cpu().numpy().astype(np.int8)
-                #     case_name = case_name.replace('.nii.gz', '_seg_result.nii.gz')
-                #     import nibabel as nib
-                #     nib.save(nib.Nifti1Image(labels[0].astype(np.uint8), np.eye(4)),os.path.join(args.results_folder, case_name))
-
-                # start_time = time.time()
-
-
-        # print("prediction1", prediction.shape, np.unique(prediction))
         prediction = prediction.transpose((2, 1, 0))
 
-
-        ################################################################################################################
-        #################################### Beginning of your prediction method. ######################################
-        # todo replace with your best model here!
-        # As an example, we'll segment the DWI using a 99th-percentile intensity cutoff.
-
-        # dwi_image_data = SimpleITK.GetArrayFromImage(dwi_image)
-        # dwi_cutoff = np.percentile(dwi_image_data[dwi_image_data > 0], 99)
-        # prediction = dwi_image_data > dwi_cutoff
-
-        #################################### End of your prediction method. ############################################
-        ################################################################################################################
         return prediction.astype(int)
 
     def process_isles_case(self, input_data, input_filename):
