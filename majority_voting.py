@@ -34,11 +34,11 @@ class ISLES22():
     def load_data(self):
         dwi_folder    = 'dwi-brain-mri'
         adc_folder    = 'adc-brain-mri'
-        flair_folder  = 'flair-brain-mri'
+        #flair_folder  = 'flair-brain-mri'
 
         self.dwi_path   = glob(os.path.join(self.root, dwi_folder, '*.nii.gz'))[0]
         self.adc_path   = glob(os.path.join(self.root, adc_folder, '*.nii.gz'))[0]
-        self.flair_path = glob(os.path.join(self.root, flair_folder, '*.nii.gz'))[0]
+        #self.flair_path = glob(os.path.join(self.root, flair_folder, '*.nii.gz'))[0]
 
 
 if __name__=='__main__':
@@ -71,22 +71,22 @@ if __name__=='__main__':
             pred_image = sitk.ReadImage(pred_file)
             pred_array[folder] = sitk.GetArrayFromImage(pred_image).astype(np.int8)
         except:
-            print('Error in {}'.format(folder))
-
+            0
     # majority voting - all outputs available
     if all(key in pred_array for key in teams):
+        print('Running Majority voting ...')
         result_array = pred_array['seals'] + pred_array['nvauto'] + pred_array['factorizer']
         result_array = result_array/3 > 0.5
     # backup- if one algorithm fails, return results from the available best-ranked team.
     elif 'seals' in pred_array.keys():
         result_array = pred_array['seals']
-        print('At least one algorithm failed. Returning results from SEALS.')
+        print('Returning results from SEALS `algorithm`.')
     elif 'nvauto' in pred_array.keys():
         result_array = pred_array['nvauto']
-        print('At least one algorithm failed. Returning results from NVAUTO.')
+        print('Returning results from NVAUTO algorithm.')
     else:
         result_array = pred_array['factorizer']
-        print('At least one algorithm failed. Returning results from FACTORIZER.')
+        print('Returning results from FACTORIZER algorithm.')
 
     # Write results
     result_image = sitk.GetImageFromArray(result_array.astype(np.uint8))
