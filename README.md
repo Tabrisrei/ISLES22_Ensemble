@@ -21,9 +21,10 @@ The top-3 leading algorithms are used in a majority-voting scheme to predict out
 
 ```bash
 git clone https://github.com/Tabrisrei/ISLES22_Ensemble.git
+cd ISLES22_Ensemble
 ```
 
-1.2) Create conda environment and install dependencies. 
+1.2) Create a conda environment and install dependencies. 
 **Note: Mandatory Python version 3.8.0 (!)**
 
 ```bash
@@ -32,12 +33,6 @@ conda activate isles_ensemble
 conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=11.3 -c pytorch
 conda install -c conda-forge openslide-python
 conda install python=3.8.0 # important, since pytorch triggers the installation of later python versions
-```
-
-1.3) Install dependencies for the ensemble algorithm .
-
-```bash
-cd ISLES22_Ensemble
 pip install -e SEALS/
 pip install -e FACTORIZER/model/factorizer/
 pip install -r requirements.txt
@@ -45,12 +40,17 @@ pip install -r requirements.txt
 
 If successfully installed all required packages, you can follow  the steps below to download and place the checkpoints.
 
-1.4) Download all content from https://drive.google.com/drive/folders/1GQP5nmtoIfhyu2LHCzPVYnZZ7ZQDX1go?usp=drive_link
+1.3) Download the model weights from [here](https://drive.google.com/drive/folders/1_NqCVS88coFdkzYPzOapVKlhmdqKOhqK?zx=67gokxezdc8f) and decompress the file.
+Your directory shoul look like:
 
-1.5) 
-- Decompress the file "nnUNet_trained_models.tar.gz" in `~/ISLES22_Ensemble/SEALS/data/`.
-- Decompress the file "ts.tar.gz" in `~/ISLES22_Ensemble/NVAUTO/`.
-- Decompress "log.tar.gz" in `~/ISLES22_Ensemble/FACTORIZER/model/`.
+ISLES22_Ensemble/
+├── weights/
+│   ├── SEALS/
+│   │   └── (...) 
+│   ├── NVAUTO/
+│   │   └── (...) 
+│   └── FACTORIZER/
+│       └── (...)
 
 
 ## Usage
