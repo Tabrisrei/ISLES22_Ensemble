@@ -3,13 +3,9 @@ import numpy as np
 import json
 import os
 from pathlib import Path
-import time, copy
-from functools import partial
 import torch
 from torch.cuda.amp import autocast
 from monai import transforms, data
-from monai.metrics import compute_meandice
-from monai.networks import one_hot
 from monai.inferers import SlidingWindowInferer
 from monai.data.utils import decollate_batch
 import sys
@@ -43,9 +39,6 @@ class ThresholdModel():
             self._case_results = []
 
     def predict(self, input_data):
-        print("Inside predict")
-        # print(input_data)
-
         """
         Input   input_data, dict.
                 The dictionary contains 3 images and 3 json files.
@@ -55,11 +48,6 @@ class ThresholdModel():
                 Binary mask encoding the lesion segmentation (0 background, 1 foreground).
         """
         # Get all image inputs.
-        dwi_image, adc_image, flair_image = input_data['dwi_image'],\
-                                            input_data['adc_image'],\
-                                            input_data['flair_image']
-
-
         dwi_image_path, adc_image_path, flair_image_path = input_data['dwi_image_path'],\
                                                             input_data['adc_image_path'],\
                                                             input_data['flair_image_path']
@@ -114,12 +102,6 @@ class ThresholdModel():
 
                         ]
 
-
-        #n_classes = 2
-        #in_channels=2
-        #accuracy=0
-        #start_time = time.time()
-        #validation_files_copy = copy.deepcopy(validation_files)
         model_inferer = SlidingWindowInferer(roi_size=[192, 192, 128], overlap=0.625, mode='gaussian', cache_roi_weight_map=True, sw_batch_size=2)
 
         with torch.no_grad():

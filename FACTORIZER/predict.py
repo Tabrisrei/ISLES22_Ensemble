@@ -2,7 +2,7 @@ from typing import Dict, List, Optional, Sequence
 import os
 import glob
 import warnings
-
+import logging
 import numpy as np
 import torch
 from torch.utils.data._utils.collate import np_str_obj_array_pattern
@@ -10,9 +10,9 @@ from pytorch_lightning import seed_everything
 import SimpleITK as sitk
 from monai import transforms
 from monai.data.utils import orientation_ras_lps
-
 import factorizer as ft
 
+logging.getLogger("pytorch_lightning").setLevel(logging.ERROR)
 warnings.filterwarnings("ignore")
 seed_everything(42, workers=True)
 torch.set_default_dtype(torch.float32)
@@ -38,6 +38,7 @@ def predict(dwi, adc, flair):
         batch_size=1,
         seed=42,
     )
+
     test_transform = transforms.Compose(
         [
             LoadFromSimpleITKd("input"),
@@ -327,66 +328,3 @@ def _stack_images(image_list: List, meta_dict: Dict):
     meta_dict["original_channel_dim"] = 0
     return np.stack(image_list, axis=0)
 
-
-# ###############
-# img_id = "sub-strokecase0001"
-# img_path = "/Users/pooya/Library/CloudStorage/OneDrive-KULeuven/PhD_thesis/research/ISLES2022/data/input/images/dwi-brain-mri/sub-strokecase0001_ses-0001_dwi.nii.gz"
-
-# # SimpleITK read module
-# sitk_img = sitk.ReadImage(img_path)
-# sitk_array_ = sitk.GetArrayFromImage(sitk_img)
-# sitk_array_ = torch.tensor(sitk_array_.astype(np.float32))
-
-# # My LoadImage module based on SimpleITK
-# sitk_img = sitk.ReadImage(img_path)
-# data = {"input": sitk_img}
-# trans = transforms.Compose(
-#     [LoadFromSimpleITKd("input"), transforms.ToTensord("input"),]
-# )
-# data = trans(data)
-# sitk_array, sitk_meta = data["input"], data["input_meta_dict"]
-
-# assert torch.all(sitk_array_ == sitk_array.T)
-
-
-# ###############
-# # My LoadImage module based on SimpleITK (with NormalizeIntensityd)
-# sitk_img = sitk.ReadImage(img_path)
-# data = {"input": sitk_img}
-# trans = transforms.Compose(
-#     [
-#         LoadFromSimpleITKd("input"),
-#         transforms.NormalizeIntensityd(
-#             "input", nonzero=True, channel_wise=True
-#         ),
-#         transforms.ToTensord("input"),
-#     ]
-# )
-# data = trans(data)
-# sitk_array, sitk_meta = data["input"], data["input_meta_dict"]
-
-# # MONAI LoadImage module
-# data_properties = {"test": [{"id": img_id, "image": img_path}]}
-# dm = ft.ISLESDataModule(
-#     data_properties=data_properties,
-#     spacing=[2.0, 2.0, 2.0],
-#     spatial_size=[64, 64, 64],
-#     num_workers=0,
-#     cache_num=1,
-#     cache_rate=1.0,
-#     batch_size=1,
-#     seed=42,
-# )
-# dm.setup("test")
-
-# data = dm.test_set[0]
-# itk_array, itk_meta = data["input"], data["input_meta_dict"]
-
-# assert torch.all(sitk_array == itk_array)
-# # assert set(sitk_meta.keys()) == set(itk_meta.keys())
-
-# # for k in sitk_meta.keys():
-# #     if isinstance(sitk_meta[k], np.ndarray):
-# #         assert np.allclose(sitk_meta[k], itk_meta[k])
-# #     else:
-# #         assert sitk_meta[k] == itk_meta[k]

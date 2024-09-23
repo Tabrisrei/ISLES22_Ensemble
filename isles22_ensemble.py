@@ -1,17 +1,32 @@
 import os
 import shutil
 import subprocess
+from colorama import Fore, Style, init
 
+# Initialize colorama for cross-platform support
+init(autoreset=True)
 # Author: Ezequiel de la Rosa (ezequieldlrosa@gmail.com)
 # 22.12.2023
 
-def print_run(algorithm):
-    print('#########################################################')
-    print('#########################################################')
-    print('Running {} algorithm ...'.format(algorithm))
-    print('#########################################################')
-    print('#########################################################')
+def print_ensemble_message():
+    # Aesthetic header
+    print(Fore.WHITE + '####################################################################################################')
+    print(Fore.WHITE + '####################################################################################################')
 
+    # Citation information in green
+    print(Fore.BLUE + "If you are using The Isles'22 Ensemble algorithm, please cite the following work:")
+
+    # Reference formatted as white text
+    print(Fore.YELLOW + Style.BRIGHT + """de la Rosa, E. et al. (2024) A Robust Ensemble Algorithm for Ischemic Stroke Lesion Segmentation:
+          Generalizability and Clinical Utility Beyond the ISLES Challenge. arXiv:2403.19425.""")
+
+    # Closing aesthetic separators
+    print(Fore.WHITE + '####################################################################################################')
+    print(Fore.WHITE + '####################################################################################################')
+
+
+def print_run(algorithm):
+    print('Running {} algorithm ...'.format(algorithm))
 
 def predict_ensemble(isles_ensemble_path, input_dwi_path, input_adc_path, input_flair_path, output_path, save_team_outputs=False):
     ''' Runs the Isles'22 Ensemble algorithm.
@@ -62,7 +77,9 @@ def predict(isles_ensemble_path, input_dwi_path):
 
     # Run SEALS Docker (https://github.com/Tabrisrei/ISLES22_SEALS)
     # Contact person: Shengbo Gao (GTabris@buaa.edu.cn)
-     
+    print_ensemble_message()
+
+
     print_run('SEALS')
     path_seals = isles_ensemble_path + '/SEALS/'
     command_seals = path_seals
@@ -71,7 +88,7 @@ def predict(isles_ensemble_path, input_dwi_path):
 
     # Run NVAUTO Docker (https://github.com/mahfuzmohammad/isles22)
     # Contact person: Md Mahfuzur Rahman Siddiquee (mrahmans@asu.edu)
-    
+
     print_run('NVAUTO')
     path_nvauto = isles_ensemble_path + '/NVAUTO/'
     command_nvauto = f'python process.py'
@@ -91,14 +108,8 @@ def predict(isles_ensemble_path, input_dwi_path):
     path_voting = isles_ensemble_path
     command_voting = f'python majority_voting.py -i output_teams/ -o output/images/stroke-lesion-segmentation/'
     subprocess.call(command_voting, shell=True, cwd=path_voting)
-    print('Finished: ', input_dwi_path)
-    print('#########################################################')
-    print('#########################################################')
-    print("If you are using The Isles'22 Ensemble algorithm, please cite the following work:")
-    print("""de la Rosa, E. et al. (2024) A Robust Ensemble Algorithm for Ischemic Stroke Lesion Segmentation:
-          Generalizability and Clinical Utility Beyond the ISLES Challenge. arXiv:2403.19425.""")
-    print('#########################################################')
-    print('#########################################################')
+    print(Fore.GREEN + Style.BRIGHT + f'Finished: {input_dwi_path}')
+
 
 
 

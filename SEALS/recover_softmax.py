@@ -11,26 +11,13 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-import pdb
-import shutil
+
 import argparse
 from glob import glob
-from typing import Tuple
-from copy import deepcopy
-from collections import OrderedDict
-from multiprocessing.pool import Pool
 
 import numpy as np
-import nibabel as nib
 import SimpleITK as sitk
-import scipy.stats as ss
-from skimage import transform
-from medpy.metric import dc, hd95
-
 from batchgenerators.utilities.file_and_folder_operations import *
-from nnunet.dataset_conversion.utils import generate_dataset_json
-from nnunet.paths import nnUNet_raw_data, preprocessing_output_dir
-from nnunet.utilities.file_conversions import convert_2d_image_to_nifti
 
 class ISLES22():
     def __init__(self, root):
@@ -94,7 +81,6 @@ def reimplement_resize(image_file, target_file, resample_method=sitk.sitkLinear)
     # launch the resampler
     resampled_image_file = resampler_image.Execute(image_file)
     resampled_image_file = sitk.GetArrayFromImage(resampled_image_file)
-    # pdb.set_trace()
 
     return resampled_image_file
 

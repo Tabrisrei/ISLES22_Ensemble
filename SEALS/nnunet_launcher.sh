@@ -1,21 +1,15 @@
-export nnUNet_raw_data_base="data/nnUNet_raw_data_base"
-export nnUNet_preprocessed="data/nnUNet_preprocessed"
-export RESULTS_FOLDER="../weights/SEALS/nnUNet_trained_models"
-export nnUNet_n_proc_DA=24
+#!/bin/bash
 
-#dataset conversion
-python nnunet/dataset_conversion/Task500_Ischemic_Stroke_Test.py
+# Suppressing output of environment variable exports
+export nnUNet_raw_data_base="data/nnUNet_raw_data_base" >/dev/null 2>&1
+export nnUNet_preprocessed="data/nnUNet_preprocessed" >/dev/null 2>&1
+export RESULTS_FOLDER="../weights/SEALS/nnUNet_trained_models" >/dev/null 2>&1
+export nnUNet_n_proc_DA=24 >/dev/null 2>&1
 
-#dataset preprocessing
-# nnUNet_plan_and_preprocess -t 500 --verify_dataset_integrity
+# Suppressing dataset conversion
+python nnunet/dataset_conversion/Task500_Ischemic_Stroke_Test.py >/dev/null 2>&1
 
-
-#reform pickle files to be compatible with nnUNetTrainerV2_DDP
-# nnUNet_change_trainer_class -i data/nnUNet_trained_models/nnUNet/3d_fullres/Task012_Ischemic_Stroke_Two_Modality/nnUNetTrainerV2_DDP__nnUNetPlansv2.1 \
-nnUNet_change_trainer_class -i ../weights/SEALS/nnUNet_trained_models/nnUNet/3d_fullres/Task012_Ischemic_Stroke_TM_Fullset/nnUNetTrainerV2_DDP__nnUNetPlansv2.1 \
-                            -tr nnUNetTrainerV2 \
-
-# inference
+# Suppressing inference commands
 CUDA_VISIBLE_DEVICES=0 \
 nnUNet_predict \
                -i $nnUNet_raw_data_base/nnUNet_raw_data/Task500_Ischemic_Stroke_Test/imagesTs/ \
@@ -26,7 +20,8 @@ nnUNet_predict \
                -f 0 \
                -z \
                --overwrite_existing \
-               --disable_postprocessing  
+               --disable_postprocessing \
+               >/dev/null 2>&1
 
 CUDA_VISIBLE_DEVICES=0 \
 nnUNet_predict \
@@ -38,7 +33,8 @@ nnUNet_predict \
                -f 1 \
                -z \
                --overwrite_existing \
-               --disable_postprocessing
+               --disable_postprocessing \
+               >/dev/null 2>&1
 
 CUDA_VISIBLE_DEVICES=0 \
 nnUNet_predict \
@@ -50,8 +46,9 @@ nnUNet_predict \
                -f 2 \
                -z \
                --overwrite_existing \
-               --disable_postprocessing
-               
+               --disable_postprocessing \
+               >/dev/null 2>&1
+
 CUDA_VISIBLE_DEVICES=0 \
 nnUNet_predict \
                -i $nnUNet_raw_data_base/nnUNet_raw_data/Task500_Ischemic_Stroke_Test/imagesTs/ \
@@ -62,7 +59,8 @@ nnUNet_predict \
                -f 3 \
                -z \
                --overwrite_existing \
-               --disable_postprocessing
+               --disable_postprocessing \
+               >/dev/null 2>&1
 
 CUDA_VISIBLE_DEVICES=0 \
 nnUNet_predict \
@@ -74,56 +72,64 @@ nnUNet_predict \
                -f 4 \
                -z \
                --overwrite_existing \
-               --disable_postprocessing
+               --disable_postprocessing \
+               >/dev/null 2>&1
 
-# recover resampled and croped images
+# Suppressing the python scripts for postprocessing
 python recover_softmax.py \
                         -i test_result \
                         -o test_result_recover/preliminary_phase/fold0 \
                         -m preliminary_phase \
-                        -f fold0
+                        -f fold0 \
+                        >/dev/null 2>&1
 
 python recover_softmax.py \
                         -i test_result \
                         -o test_result_recover/preliminary_phase/fold1 \
                         -m preliminary_phase \
-                        -f fold1
+                        -f fold1 \
+                        >/dev/null 2>&1
 
 python recover_softmax.py \
                         -i test_result \
                         -o test_result_recover/preliminary_phase/fold2 \
                         -m preliminary_phase \
-                        -f fold2                      
+                        -f fold2 \
+                        >/dev/null 2>&1
 
 python recover_softmax.py \
                         -i test_result \
                         -o test_result_recover/preliminary_phase/fold3 \
                         -m preliminary_phase \
-                        -f fold3
+                        -f fold3 \
+                        >/dev/null 2>&1
 
 python recover_softmax.py \
                         -i test_result \
                         -o test_result_recover/preliminary_phase/fold4 \
                         -m preliminary_phase \
-                        -f fold4
+                        -f fold4 \
+                        >/dev/null 2>&1
 
-# ensemble softmax
+# Suppressing ensemble softmax
 model_0=test_result_recover/preliminary_phase/fold0
 model_1=test_result_recover/preliminary_phase/fold1
 model_2=test_result_recover/preliminary_phase/fold2
 model_3=test_result_recover/preliminary_phase/fold3
 model_4=test_result_recover/preliminary_phase/fold4
-python -m ensemble_predictions -f $model_0 \
-                                  $model_1 \
-                                  $model_2 \
-                                  $model_4 \
-                                  $model_5 \
-                                -o test_ensemble/ \
-                                --npz
 
+python -m ensemble_predictions \
+       -f $model_0 \
+          $model_1 \
+          $model_2 \
+          $model_3 \
+          $model_4 \
+       -o test_ensemble/ \
+       --npz \
+       >/dev/null 2>&1
 
-
+# Suppressing thresholding final output
 python threshold_redirect.py \
                             -i test_ensemble/ \
-                            -o ../output_teams/seals/images/stroke-lesion-segmentation/
-
+                            -o ../output_teams/seals/images/stroke-lesion-segmentation/ \
+                            >/dev/null 2>&1

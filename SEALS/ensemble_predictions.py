@@ -17,11 +17,9 @@ import shutil
 from copy import deepcopy
 from typing import Union, Tuple
 import SimpleITK as sitk
-
 from batchgenerators.utilities.file_and_folder_operations import *
 import numpy as np
 from multiprocessing import Pool
-from nnunet.preprocessing.preprocessing import get_lowres_axis, get_do_separate_z, resample_data_or_seg
 from nnunet.postprocessing.connected_components import apply_postprocessing_to_folder, load_postprocessing
 
 def save_segmentation_nifti_from_softmax(segmentation_softmax: Union[str, np.ndarray], 
