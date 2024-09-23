@@ -1,6 +1,6 @@
 export nnUNet_raw_data_base="data/nnUNet_raw_data_base"
 export nnUNet_preprocessed="data/nnUNet_preprocessed"
-export RESULTS_FOLDER="data/nnUNet_trained_models"
+export RESULTS_FOLDER="../weights/SEALS/nnUNet_trained_models"
 export nnUNet_n_proc_DA=24
 
 #dataset conversion
@@ -12,7 +12,7 @@ python nnunet/dataset_conversion/Task500_Ischemic_Stroke_Test.py
 
 #reform pickle files to be compatible with nnUNetTrainerV2_DDP
 # nnUNet_change_trainer_class -i data/nnUNet_trained_models/nnUNet/3d_fullres/Task012_Ischemic_Stroke_Two_Modality/nnUNetTrainerV2_DDP__nnUNetPlansv2.1 \
-nnUNet_change_trainer_class -i data/nnUNet_trained_models/nnUNet/3d_fullres/Task012_Ischemic_Stroke_TM_Fullset/nnUNetTrainerV2_DDP__nnUNetPlansv2.1 \
+nnUNet_change_trainer_class -i ../weights/SEALS/nnUNet_trained_models/nnUNet/3d_fullres/Task012_Ischemic_Stroke_TM_Fullset/nnUNetTrainerV2_DDP__nnUNetPlansv2.1 \
                             -tr nnUNetTrainerV2 \
 
 # inference
