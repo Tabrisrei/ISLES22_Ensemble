@@ -76,9 +76,7 @@ OUTPUT_PATH = 'path-to-output-folder'
 predict_ensemble(isles_ensemble_path=ENSEMBLE_PATH,
                  input_dwi_path=INPUT_DWI,
                  input_adc_path=INPUT_ADC,
-                 input_flair_path=INPUT_FLAIR,
-                 output_path=OUTPUT_PATH,
-                 save_team_outputs=False)
+                 input_flair_path=INPUT_FLAIR)
 ```
 
 From terminal
