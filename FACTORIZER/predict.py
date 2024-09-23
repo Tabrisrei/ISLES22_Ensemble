@@ -47,40 +47,50 @@ def predict(dwi, adc, flair):
     )
     dm.test_transform = test_transform
     dm.setup("test")
-
+    base_model_path = os.path.join(os.path.dirname(os.getcwd()), 'weights', 'FACTORIZER')
     # load (ensemble) model
     net_class = ft.Ensemble
     net_params = {
         "models": [
             ft.SemanticSegmentation.load_from_checkpoint(
-                "model/logs/isles2022_dwi-adc-flair/fold0/resunet/version_0/checkpoints/epoch=1999-step=99999.ckpt"
+                os.path.join(base_model_path,
+                             "logs/isles2022_dwi-adc-flair/fold0/resunet/version_0/checkpoints/epoch=1999-step=99999.ckpt")
             ),
             ft.SemanticSegmentation.load_from_checkpoint(
-                "model/logs/isles2022_dwi-adc-flair/fold1/resunet/version_0/checkpoints/epoch=1999-step=99999.ckpt"
+                os.path.join(base_model_path,
+                             "logs/isles2022_dwi-adc-flair/fold1/resunet/version_0/checkpoints/epoch=1999-step=99999.ckpt")
             ),
             ft.SemanticSegmentation.load_from_checkpoint(
-                "model/logs/isles2022_dwi-adc-flair/fold2/resunet/version_0/checkpoints/epoch=1999-step=99999.ckpt"
+                os.path.join(base_model_path,
+                             "logs/isles2022_dwi-adc-flair/fold2/resunet/version_0/checkpoints/epoch=1999-step=99999.ckpt")
             ),
             ft.SemanticSegmentation.load_from_checkpoint(
-                "model/logs/isles2022_dwi-adc-flair/fold3/resunet/version_0/checkpoints/epoch=1999-step=99999.ckpt"
+                os.path.join(base_model_path,
+                             "logs/isles2022_dwi-adc-flair/fold3/resunet/version_0/checkpoints/epoch=1999-step=99999.ckpt")
             ),
             ft.SemanticSegmentation.load_from_checkpoint(
-                "model/logs/isles2022_dwi-adc-flair/fold4/resunet/version_0/checkpoints/epoch=1999-step=99999.ckpt"
+                os.path.join(base_model_path,
+                             "logs/isles2022_dwi-adc-flair/fold4/resunet/version_0/checkpoints/epoch=1999-step=99999.ckpt")
             ),
             ft.SemanticSegmentation.load_from_checkpoint(
-                "model/logs/isles2022_dwi-adc-flair/fold0/swin-factorizer/version_0/checkpoints/epoch=1999-step=99999.ckpt"
+                os.path.join(base_model_path,
+                             "logs/isles2022_dwi-adc-flair/fold0/swin-factorizer/version_0/checkpoints/epoch=1999-step=99999.ckpt")
             ),
             ft.SemanticSegmentation.load_from_checkpoint(
-                "model/logs/isles2022_dwi-adc-flair/fold1/swin-factorizer/version_0/checkpoints/epoch=1999-step=99999.ckpt"
+                os.path.join(base_model_path,
+                             "logs/isles2022_dwi-adc-flair/fold1/swin-factorizer/version_0/checkpoints/epoch=1999-step=99999.ckpt")
             ),
             ft.SemanticSegmentation.load_from_checkpoint(
-                "model/logs/isles2022_dwi-adc-flair/fold2/swin-factorizer/version_0/checkpoints/epoch=1999-step=99999.ckpt"
+                os.path.join(base_model_path,
+                             "logs/isles2022_dwi-adc-flair/fold2/swin-factorizer/version_0/checkpoints/epoch=1999-step=99999.ckpt")
             ),
             ft.SemanticSegmentation.load_from_checkpoint(
-                "model/logs/isles2022_dwi-adc-flair/fold3/swin-factorizer/version_0/checkpoints/epoch=1999-step=99999.ckpt"
+                os.path.join(base_model_path,
+                             "logs/isles2022_dwi-adc-flair/fold3/swin-factorizer/version_0/checkpoints/epoch=1999-step=99999.ckpt")
             ),
             ft.SemanticSegmentation.load_from_checkpoint(
-                "model/logs/isles2022_dwi-adc-flair/fold4/swin-factorizer/version_0/checkpoints/epoch=1999-step=99999.ckpt"
+                os.path.join(base_model_path,
+                             "logs/isles2022_dwi-adc-flair/fold4/swin-factorizer/version_0/checkpoints/epoch=1999-step=99999.ckpt")
             ),
         ],
         "weights": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
