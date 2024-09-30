@@ -42,7 +42,7 @@ pip install -e ./HD-BET
 
 If successfully installed all required packages, you can follow  the steps below to download and place the checkpoints.
 
-1.3) Download the model weights from [here](https://drive.google.com/drive/folders/1_NqCVS88coFdkzYPzOapVKlhmdqKOhqK?zx=67gokxezdc8f) and decompress the file.
+1.3) Download the model weights from [here](https://drive.google.com/drive/folders/1_NqCVS88coFdkzYPzOapVKlhmdqKOhqK?zx=67gokxezdc8f) and decompress the file inside this repo.
 Your directory shoul look like:
 ```
 
