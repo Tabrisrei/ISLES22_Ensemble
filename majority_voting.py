@@ -75,18 +75,22 @@ if __name__=='__main__':
     # majority voting - all outputs available
     if all(key in pred_array for key in teams):
         print('Running Majority voting ...')
+        print()
         result_array = pred_array['seals'] + pred_array['nvauto'] + pred_array['factorizer']
         result_array = result_array/3 > 0.5
     # backup- if one algorithm fails, return results from the available best-ranked team.
     elif 'seals' in pred_array.keys():
         result_array = pred_array['seals']
         print('Returning results from SEALS `algorithm`.')
+        print()
     elif 'nvauto' in pred_array.keys():
         result_array = pred_array['nvauto']
         print('Returning results from NVAUTO algorithm.')
+        print()
     else:
         result_array = pred_array['factorizer']
         print('Returning results from FACTORIZER algorithm.')
+        print()
 
     # Write results
     result_image = sitk.GetImageFromArray(result_array.astype(np.uint8))
