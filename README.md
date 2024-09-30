@@ -65,7 +65,7 @@ ISLES22_Ensemble/
 ### Required Image Modalities
 - **DWI (b=1000)**: Required
 - **ADC**: Required
-- **FLAIR**: Optional
+- **FLAIR**: Required for ensemble (optional for single algorithm outputs)
 
 ### Extra Parameters
 - **`fast`**: `True`/`False` (default: `False`)  
