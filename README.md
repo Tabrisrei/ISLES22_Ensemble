@@ -58,9 +58,25 @@ ISLES22_Ensemble/
 
 
 ## Usage
-The algorithms works over **skull-stripped MRI images**, directly in native-space (no image co-registration is needed). Image modalities required for running the algorithm are DWI (b=1000), ADC and FLAIR. 
+### Supported Formats
+- **Input formats**: DICOM, `.nii`, `.nii.gz`, `.mha`.
+- **Processing**: The algorithm works directly in the native image space — no additional preprocessing required.
 
-**Note: DWI and ADC images are supposed to be obtained from the same acquisition timepoint. Differences between them (e.g. affine, voxel resolution, number of voxels, etc.) might impact the algorithm performance.**
+### Required Image Modalities
+- **DWI (b=1000)**: Required
+- **ADC**: Required
+- **FLAIR**: Optional
+
+### Extra Parameters
+- **`fast`**: `True`/`False` (default: `False`)  
+  Enable fast execution by running only the winning algorithm.
+  
+- **`save_team_outputs`**: `True`/`False` (default: `False`)  
+  Save outputs of individual algorithms before ensembling.
+
+- **`skull_strip`**: `True`/`False` (default: `False`)  
+  Perform skull stripping on the input images.
+
 
 From Python
 
