@@ -63,20 +63,22 @@ The algorithms works over **skull-stripped MRI images**, directly in native-spac
 From Python
 
 ```bash
-import sys
 ENSEMBLE_PATH = 'path-to-isles-ensemble-repo' 
+import sys
+from isles22_ensemble import IslesEnsemble
 sys.path.append(ENSEMBLE_PATH)
-from isles22_ensemble import predict_ensemble
 
 INPUT_FLAIR = 'path-to-flair.nii.gz'
 INPUT_ADC = 'path-to-adc.nii.gz'
 INPUT_DWI = 'path-to-dwi.nii.gz'
 OUTPUT_PATH = 'path-to-output-folder'
 
-predict_ensemble(isles_ensemble_path=ENSEMBLE_PATH,
+stroke_segm = IslesEnsemble()
+stroke_segm.predict_ensemble(ensemble_path=ENSEMBLE_PATH,
                  input_dwi_path=INPUT_DWI,
                  input_adc_path=INPUT_ADC,
-                 input_flair_path=INPUT_FLAIR)
+                 input_flair_path=INPUT_FLAIR,
+                 output_path=OUTPUT_PATH)
 ```
 
 From terminal
