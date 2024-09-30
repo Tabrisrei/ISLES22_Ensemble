@@ -123,3 +123,4 @@ We thank all ISLES'22 challenge participants, collaborators and organizers for a
 - The code of Team SEALS is adapted from [nnUNet](https://github.com/MIC-DKFZ/nnUNet). 
 - The code of NVAUTO is adapted from [MONAI](https://github.com/Project-MONAI/MONAI)
 - The code of SWAN is adapted from [FACTORIZER](https://github.com/pashtari/factorizer)
+- Skull-stripping is done with [HD-BET](https://github.com/MIC-DKFZ/HD-BET)
