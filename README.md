@@ -59,7 +59,7 @@ ISLES22_Ensemble/
 
 ## Usage
 ### Supported Formats
-- **Input formats**: DICOM, `.nii`, `.nii.gz`, `.mha`.
+- **Input formats**:  `.dcm`, `.nii`, `.nii.gz`, `.mha`.
 - **Processing**: The algorithm works directly in the native image space — no additional preprocessing required.
 
 ### Required Image Modalities
