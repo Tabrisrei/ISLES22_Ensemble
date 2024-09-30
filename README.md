@@ -36,6 +36,8 @@ conda install python=3.8.0 # important, since pytorch triggers the installation 
 pip install -e SEALS/
 pip install -e FACTORIZER/model/factorizer/
 pip install -r requirements.txt
+pip install -e ./HD-BET
+
 ```
 
 If successfully installed all required packages, you can follow  the steps below to download and place the checkpoints.
