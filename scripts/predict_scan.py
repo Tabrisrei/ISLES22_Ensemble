@@ -18,7 +18,8 @@ stroke_segm.predict_ensemble(ensemble_path=ENSEMBLE_PATH,
                  input_dwi_path=INPUT_DWI,
                  input_adc_path=INPUT_ADC,
                  input_flair_path=INPUT_FLAIR,
-                 output_path=OUTPUT_PATH,
-                 fast=False,
-                 save_team_outputs=True,
-                 skull_strip=True)
+                 output_path=OUTPUT_PATH)
+# Options:
+#                 fast=True,
+#                 save_team_outputs=True,
+#                 skull_strip=True)
