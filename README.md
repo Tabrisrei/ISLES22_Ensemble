@@ -99,48 +99,34 @@ stroke_segm.predict_ensemble(ensemble_path=ENSEMBLE_PATH,
                  output_path=OUTPUT_PATH)
 ```
 
-From terminal
-
-Place your MRI images (.nii.gz) in
-```bash
-~/ISLES22_Ensemble/input/images/adc-brain-mri/
-~/ISLES22_Ensemble/input/images/dwi-brain-mri/
-~/ISLES22_Ensemble/input/images/flair-brain-mri/
-```
-
-Run: 
-```bash
-bash Ensemble_launcher.sh
-```
-
-Results will be stored in `~/ISLES22_Ensemble/output/images/stroke-lesion-segmentation/`. 
-
 ## Get started 
 You can try out our algorithm using a real test scan located in `~/data`. For doing so, run the example script located in `~/scripts/predict_scan.py`.
 The example data belongs to the ISLES'22 dataset (Hernandez Petzsche et al., Sci Data 2022).
 
 ## Citation
-Please cite the following manuscripts when using The Isles'22 Ensemble:
+If you use this repository, please cite the following publications:
 
-* de la Rosa, E., Reyes, M., Liew, S. L., Hutton, A., Wiest, R., Kaesmacher, J., ... & Wiestler, B. (2024). A Robust Ensemble Algorithm for Ischemic Stroke Lesion Segmentation: Generalizability and Clinical Utility Beyond the ISLES Challenge. arXiv preprint arXiv:2403.19425.
+1. **de la Rosa, E., Reyes, M., Liew, S. L., Hutton, A., Wiest, R., Kaesmacher, J., ... & Wiestler, B. (2024).**  
+   *A Robust Ensemble Algorithm for Ischemic Stroke Lesion Segmentation: Generalizability and Clinical Utility Beyond the ISLES Challenge.*  
+   arXiv preprint: [arXiv:2403.19425](https://arxiv.org/abs/2403.19425)
 
-* Hernandez Petzsche, M. R., de la Rosa, E., Hanning, U., Wiest, R., Valenzuela, W., Reyes, M., ... & Kirschke, J. S. (2022). ISLES 2022: A multi-center magnetic resonance imaging stroke lesion segmentation dataset. Scientific data, 9(1), 762.
+2. **Hernandez Petzsche, M. R., de la Rosa, E., Hanning, U., Wiest, R., Valenzuela, W., Reyes, M., ... & Kirschke, J. S. (2022).**  
+   *ISLES 2022: A multi-center magnetic resonance imaging stroke lesion segmentation dataset.*  
+   *Scientific Data, 9*(1), 762.
+
 
 
 ## About the Ensembled Algorithms 
-* Algorithm SEALS is based on nnUnet. Git [repo](https://github.com/Tabrisrei/ISLES22_SEALS) 
+* Algorithm SEALS is based on [nnUnet](https://github.com/MIC-DKFZ/nnUNet). Git [repo](https://github.com/Tabrisrei/ISLES22_SEALS) 
 
-* Algorithm NVAUTO is based on MONAI Auto3dseg. Git [repo](https://github.com/mahfuzmohammad/isles22)
+* Algorithm NVAUTO is based on [MONAI](https://github.com/Project-MONAI/MONAI) Auto3dseg. Git [repo](https://github.com/mahfuzmohammad/isles22)
 
-* Algorithm SWAN is based on FACTORIZER. Git [repo](https://github.com/pashtari/factorizer-isles22)
+* Algorithm SWAN is based on [FACTORIZER](https://github.com/pashtari/factorizer). Git [repo](https://github.com/pashtari/factorizer-isles22)
 
 
 ## Questions
-Please contact Ezequiel de la Rosa (ezequiel.delarosa@uzh.ch) or Shengbo Gao (gtabris@buaa.edu.cn).
+Please contact Ezequiel de la Rosa (ezequiel.delarosa@uzh.ch).
 
 ## Acknowledgement
-We thank all ISLES'22 challenge participants, collaborators and organizers for allowing this work to happen. We also thank all developers and maintaners of the repositories named below for sharing such valuable resources.
-- The code of Team SEALS is adapted from [nnUNet](https://github.com/MIC-DKFZ/nnUNet). 
-- The code of NVAUTO is adapted from [MONAI](https://github.com/Project-MONAI/MONAI)
-- The code of SWAN is adapted from [FACTORIZER](https://github.com/pashtari/factorizer)
+- We thank all ISLES'22 challenge participants, collaborators and organizers for allowing this work to happen. We also thank all developers and maintaners of the repos herein used. 
 - Skull-stripping is done with [HD-BET](https://github.com/MIC-DKFZ/HD-BET)
