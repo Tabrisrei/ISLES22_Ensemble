@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="Always" serverName="edelarosa@130.60.62.134:22 password (6)" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="edelarosa@130.60.62.134:22 password (5)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/Users/ezequiel/Documents/git/ISLES22_Ensemble" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="edelarosa@130.60.62.134:22 password (6)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/edelarosa/Documents/git/ISLES22_Ensemble" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
+  </component>
+</project>
