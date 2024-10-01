@@ -3,8 +3,8 @@
 
 import os
 import sys
+ENSEMBLE_PATH = os.getcwd()                                                   # path-to-ensemble-repo
 from isles22_ensemble import IslesEnsemble
-ENSEMBLE_PATH = os.path.dirname(os.getcwd())                                                   # path-to-ensemble-repo
 sys.path.append(ENSEMBLE_PATH)
 
 # .nii or DICOM paths
