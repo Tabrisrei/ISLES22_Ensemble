@@ -69,7 +69,7 @@ ISLES22_Ensemble/
 
 ### Extra Parameters
 - **`fast`**: `True`/`False` (default: `False`)  
-  Enable fast execution by running only the winning algorithm.
+  Enable fast execution by running a single model.
   
 - **`save_team_outputs`**: `True`/`False` (default: `False`)  
   Save outputs of individual algorithms before ensembling.
