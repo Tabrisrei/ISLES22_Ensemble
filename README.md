@@ -100,8 +100,12 @@ stroke_segm.predict_ensemble(ensemble_path=ENSEMBLE_PATH,
 ```
 
 ## Get started 
-You can try out our algorithm using a real test scan located in `~/data`. For doing so, run the example script located in `~/scripts/predict_scan.py`.
-The example data belongs to the ISLES'22 dataset (Hernandez Petzsche et al., Sci Data 2022).
+Try out our algorithm running:
+```bash
+ python scripts/predict_scan.py
+```
+
+The example scan belongs to the ISLES'22 dataset (Hernandez Petzsche et al., Sci Data 2022).
 
 ## Citation
 If you use this repository, please cite the following publications:
