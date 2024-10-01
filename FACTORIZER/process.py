@@ -6,8 +6,7 @@ import numpy as np
 from predict import predict
 
 DEFAULT_INPUT_PATH = Path("../input")
-DEFAULT_ALGORITHM_OUTPUT_IMAGES_PATH = Path("../output_teams/factorizer/images/")
-DEFAULT_ALGORITHM_OUTPUT_FILE_PATH = Path("../output_teams/factorizer/results.json")
+DEFAULT_ALGORITHM_OUTPUT_IMAGES_PATH = Path("../output_teams/factorizer/")
 
 
 # todo change with your team-name
@@ -22,20 +21,12 @@ class Factorizer:
         if self.debug:
             self._input_path = Path("~/factorizer/test/")
             self._output_path = Path("~/factorizer/test/output/")
-            self._algorithm_output_path = (
-                self._output_path / "stroke-lesion-segmentation"
-            )
-            self._output_file = self._output_path / "results.json"
-            self._case_results = []
+            self._algorithm_output_path = self._output_path
 
         else:
             self._input_path = input_path
             self._output_path = output_path
-            self._algorithm_output_path = (
-                self._output_path / "stroke-lesion-segmentation"
-            )
-            self._output_file = DEFAULT_ALGORITHM_OUTPUT_FILE_PATH
-            self._case_results = []
+            self._algorithm_output_path = self._output_path
 
     def predict(self, input_data):
         """
@@ -124,15 +115,10 @@ class Factorizer:
         else:
             return file_list[0]
 
-    def save(self):
-        with open(str(self._output_file), "w") as f:
-            json.dump(self._case_results, f)
-
     def process(self):
         input_data, input_filename = self.load_isles_case()
         self.process_isles_case(input_data, input_filename)
 
 
 if __name__ == "__main__":
-    # todo change with your team-name
     Factorizer().process()

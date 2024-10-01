@@ -177,6 +177,6 @@ class IslesEnsemble:
 
         # Ensembling results
         path_voting = self.ensemble_path
-        command_voting = 'python majority_voting.py -i output_teams/ -o output/images/stroke-lesion-segmentation/'
+        command_voting = 'python majority_voting.py -i output_teams/ -o output/'
         subprocess.call(command_voting, shell=True, cwd=path_voting)
         print_completed(self.original_dwi_path)

@@ -13,9 +13,7 @@ sys.path.append('.')
 
 
 DEFAULT_INPUT_PATH = Path("../input")
-DEFAULT_ALGORITHM_OUTPUT_IMAGES_PATH = Path("../output_teams/nvauto/images/")
-DEFAULT_ALGORITHM_OUTPUT_FILE_PATH = Path("../output_teams/nvauto/results.json")
-
+DEFAULT_ALGORITHM_OUTPUT_IMAGES_PATH = Path("../output_teams/nvauto/")
 
 # todo change with your team-name
 class ThresholdModel():
@@ -27,15 +25,13 @@ class ThresholdModel():
         if self.debug:
             self._input_path = Path('./test')
             self._output_path = Path('./test/output')
-            self._algorithm_output_path = self._output_path / 'stroke-lesion-segmentation'
-            self._output_file = self._output_path / 'results.json'
+            self._algorithm_output_path = self._output_path
             self._case_results = []
 
         else:
             self._input_path = input_path
             self._output_path = output_path
-            self._algorithm_output_path = self._output_path / 'stroke-lesion-segmentation'
-            self._output_file = DEFAULT_ALGORITHM_OUTPUT_FILE_PATH
+            self._algorithm_output_path = self._output_path
             self._case_results = []
 
     def predict(self, input_data):

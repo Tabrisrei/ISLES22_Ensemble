@@ -67,7 +67,7 @@ if __name__=='__main__':
     pred_array = {}
     for folder in teams :
         try:
-            pred_file = glob(os.path.join(input_folder, folder, 'images', 'stroke-lesion-segmentation', '*.nii.gz'))[0]
+            pred_file = glob(os.path.join(input_folder, folder, '*.nii.gz'))[0]
             pred_image = sitk.ReadImage(pred_file)
             pred_array[folder] = sitk.GetArrayFromImage(pred_image).astype(np.int8)
         except:
