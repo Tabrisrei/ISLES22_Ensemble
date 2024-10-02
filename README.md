@@ -67,16 +67,6 @@ ISLES22_Ensemble/
 - **ADC**: Required
 - **FLAIR**: Required for ensemble (optional for single algorithm outputs)
 
-### Extra Parameters
-- **`fast`**: `True`/`False` (default: `False`)  
-  Enable fast execution by running a single model.
-  
-- **`save_team_outputs`**: `True`/`False` (default: `False`)  
-  Save outputs of individual algorithms before ensembling.
-
-- **`skull_strip`**: `True`/`False` (default: `False`)  
-  Perform skull stripping on the input images.
-
 
 From Python
 
@@ -98,6 +88,15 @@ stroke_segm.predict_ensemble(ensemble_path=ENSEMBLE_PATH,
                  input_flair_path=INPUT_FLAIR,
                  output_path=OUTPUT_PATH)
 ```
+
+### Extra Parameters
+
+- **`skull_strip`**: `True`/`False` (default: `False`) — Perform skull stripping on input images.
+- **`fast`**: `True`/`False` (default: `False`) — Run a single model for faster execution.
+- **`parallelize`**: `True`/`False` (default: `False`) — Up to 50% faster inference on GPUs with ≥12 GB memory.
+- **`save_team_outputs`**: `True`/`False` (default: `False`) — Save outputs of individual models before ensembling.
+
+
 
 ## Get started 
 Try out our algorithm running:
