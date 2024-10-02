@@ -7,10 +7,11 @@ ENSEMBLE_PATH = os.getcwd()                                                   # 
 sys.path.append(ENSEMBLE_PATH)
 from isles22_ensemble import IslesEnsemble
 
-# .nii or DICOM paths
+# .nii/nii.gz/.mha/.dcm paths
 INPUT_FLAIR = os.path.join(ENSEMBLE_PATH, 'data', 'sub-strokecase0001_ses-0001_flair.nii.gz')  # path-to-FLAIR
 INPUT_DWI = os.path.join(ENSEMBLE_PATH, 'data', 'sub-strokecase0001_ses-0001_dwi.nii.gz')      # pat-t-DWI
 INPUT_ADC = os.path.join(ENSEMBLE_PATH, 'data', 'sub-strokecase0001_ses-0001_adc.nii.gz')      # path-to-ADC
+
 OUTPUT_PATH = os.path.join(ENSEMBLE_PATH, 'example_test')                                      # path-to-output
 
 stroke_segm = IslesEnsemble()
@@ -22,4 +23,5 @@ stroke_segm.predict_ensemble(ensemble_path=ENSEMBLE_PATH,
 # Options:
 #                 fast=True,
 #                 save_team_outputs=True,
-#                 skull_strip=True)
+#                 skull_strip=True,
+#                 parallelize=True)

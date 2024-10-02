@@ -8,16 +8,17 @@ import nibabel as nib
 import tempfile
 import warnings
 import numpy as np
-from utils import convert_to_nii, print_run, print_ensemble_message, print_completed, extract_brain, get_img_shape, \
-    save_nii
 
+from majority_voting import ISLES22
+from utils import convert_to_nii, print_run, print_ensemble_message, print_completed, extract_brain, get_img_shape, save_nii
+from concurrent.futures import ThreadPoolExecutor
 
 class IslesEnsemble:
     def __init__(self):
         pass
 
     def predict_ensemble(self, ensemble_path, input_dwi_path, input_adc_path, output_path, input_flair_path=None,
-                         skull_strip=False, fast=False, save_team_outputs=False):
+                         skull_strip=False, fast=False, save_team_outputs=False, parallelize=False):
         ''' Runs the Isles'22 Ensemble algorithm.
 
         Inputs:
@@ -34,9 +35,11 @@ class IslesEnsemble:
 
         skull_strip: flag indicating if skull stripping is required
 
-        fast: flag for running only the winning algorithm for faster inference
+        fast: flag for running only the isles22 winning algorithm for faster inference
 
         save_team_outputs: flag for saving individual team outputs
+
+        parallelize: flag for running algorithms in parallel (default is True)
         '''
 
         # Assigning the parameters to self to be accessible throughout the class
@@ -49,6 +52,7 @@ class IslesEnsemble:
         self.skull_strip = skull_strip
         self.fast = fast
         self.save_team_outputs = save_team_outputs
+        self.parallelize = parallelize
         self.tmp_out_dir = tempfile.mkdtemp(prefix="tmp", dir="/tmp")
         self.keep_tmp_files = False
         #print(self.tmp_out_dir)
@@ -58,9 +62,11 @@ class IslesEnsemble:
         self.check_images()
         self.extract_brain()
         #self.copy_input_data()
-        self.run_inference()
+        self.inference()
         self.copy_output_clean()
+        self.ensemble()
 
+        print_completed(self.original_dwi_path)
 
     def check_images(self):
         # Check image dimensions and affine compatibility
@@ -112,7 +118,6 @@ class IslesEnsemble:
                             os.path.join(self.ensemble_path, 'input', 'images', 'flair-brain-mri', 'flair.nii.gz'))
 
     def copy_output_clean(self):
-
         # Copy results
         if self.save_team_outputs:
             shutil.copytree(os.path.join(self.tmp_out_dir, 'output'),
@@ -120,18 +125,6 @@ class IslesEnsemble:
 
         if not self.keep_tmp_files:
             shutil.rmtree(self.tmp_out_dir)
-
-        # else:
-        #     shutil.copytree(os.path.join(self.tmp_out_dir, 'output', 'ensemble'),
-        #                     os.path.join(self.output_path, 'output'))
-
-#        shutil.copytree(os.path.join(self.ensemble_path, 'output'), os.path.join(self.output_path, 'ensemble_output'))
-
-        # Remove intermediate files
-        # shutil.rmtree(os.path.join(self.ensemble_path, 'output_teams'))
-        # shutil.rmtree(os.path.join(self.ensemble_path, 'output'))
-        # if os.path.exists(os.path.join(self.ensemble_path, 'input')):
-        #     shutil.rmtree(os.path.join(self.ensemble_path, 'input'))
 
     def load_images(self):
         # Convert input files to NIfTI if needed
@@ -143,9 +136,9 @@ class IslesEnsemble:
         self.skull_strip = True if not nii_flag else self.skull_strip
 
     def extract_brain(self):
-       # Code based on HD-BET
-       # Credits to Isensee et al (HBM 2019)
-       # Git repo: https://github.com/MIC-DKFZ/HD-BET
+        # Code based on HD-BET
+        # Credits to Isensee et al (HBM 2019)
+        # Git repo: https://github.com/MIC-DKFZ/HD-BET
 
         if self.skull_strip:
             if self.input_flair_path is not None:
@@ -165,39 +158,45 @@ class IslesEnsemble:
             self.input_adc_path = self.input_adc_path.replace('adc.nii.gz', 'adc_ss.nii.gz')
             save_nii(adc_data, dwi_msk_nii.affine, dwi_msk_nii.header, self.input_adc_path)
 
+    @staticmethod
+    def run_command(command, cwd):
+        subprocess.run(command, shell=True, cwd=cwd)
 
-    def run_inference(self):
-        # Run SEALS Docker
-        # print_run('SEALS')
-        # conda_env_name = os.environ.get('CONDA_DEFAULT_ENV')
-        #
-        # # Construct the command to activate the conda environment and run the shell script
-        # path_seals = os.path.join(self.ensemble_path, 'SEALS/')
-        # command_seals = f'source activate {conda_env_name} && ./nnunet_launcher.sh {self.tmp_out_dir}'
+    def inference(self):
+        # Prepare commands
+        commands = []
 
-        # Run the command using subprocess
-#        subprocess.run(command_seals, shell=True, cwd=path_seals, executable="/bin/bash")
+        # SEALS Command
         print_run('SEALS')
-        path_seals = self.ensemble_path + '/SEALS/'
-        command_seals = path_seals
-        command_seals += f'nnunet_launcher.sh {self.tmp_out_dir}'
-        subprocess.run(command_seals, shell=True, cwd=path_seals)
+        path_seals = os.path.join(self.ensemble_path, 'SEALS/')
+        command_seals = f'./nnunet_launcher.sh {self.tmp_out_dir}'
+        commands.append((command_seals, path_seals))
 
         if self.input_flair_path is not None and not self.fast:
-            # Run NVAUTO Docker
+            # NVAUTO Command
             print_run('NVAUTO')
             path_nvauto = os.path.join(self.ensemble_path, 'NVAUTO/')
             command_nvauto = f'python process.py --input_path {self.tmp_out_dir}'
-            subprocess.run(command_nvauto, shell=True, cwd=path_nvauto)
+            commands.append((command_nvauto, path_nvauto))
 
-            # Run SWAN Docker
+            # FACTORIZER Command
             print_run('SWAN')
             path_factorizer = os.path.join(self.ensemble_path, 'FACTORIZER/')
             command_factorizer = f'python process.py --input_path {self.tmp_out_dir}'
-            subprocess.run(command_factorizer, shell=True, cwd=path_factorizer)
+            commands.append((command_factorizer, path_factorizer))
 
+        # Execute commands based on parallelization flag
+        if self.parallelize:
+            with ThreadPoolExecutor() as executor:
+                futures = [executor.submit(self.run_command, cmd, cwd) for cmd, cwd in commands]
+                for future in futures:
+                    future.result()
+        else:
+            for cmd, cwd in commands:
+                self.run_command(cmd, cwd)
+
+    def ensemble(self):
         # Ensembling results
         path_voting = self.ensemble_path
         command_voting = f'python majority_voting.py -i {self.tmp_out_dir} -o {self.output_path} '
         subprocess.call(command_voting, shell=True, cwd=path_voting)
-        print_completed(self.original_dwi_path)
