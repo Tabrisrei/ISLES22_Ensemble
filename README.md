@@ -68,14 +68,12 @@ ISLES22_Ensemble/
 - **FLAIR**: Required for ensemble (optional for single algorithm outputs)
 
 ### Extra Parameters
-- **`fast`**: `True`/`False` (default: `False`)  
-  Enable fast execution by running a single model.
-  
-- **`save_team_outputs`**: `True`/`False` (default: `False`)  
-  Save outputs of individual algorithms before ensembling.
 
-- **`skull_strip`**: `True`/`False` (default: `False`)  
-  Perform skull stripping on the input images.
+- **`skull_strip`**: `True`/`False` (default: `False`) — Perform skull stripping on input images.
+- **`fast`**: `True`/`False` (default: `False`) — Run a single model for faster execution.
+- **`parallelize`**: `True`/`False` (default: `False`) — Up to 50% faster inference on GPUs with ≥14 GB memory.
+- **`save_team_outputs`**: `True`/`False` (default: `False`) — Save outputs of individual models before ensembling.
+
 
 
 From Python
