@@ -50,13 +50,14 @@ class IslesEnsemble:
         self.fast = fast
         self.save_team_outputs = save_team_outputs
         self.tmp_out_dir = tempfile.mkdtemp(prefix="tmp", dir="/tmp")
-
+        self.keep_tmp_files = False
+        #print(self.tmp_out_dir)
         print_ensemble_message()
 
         self.load_images()
         self.check_images()
         self.extract_brain()
-        self.copy_input_data()
+        #self.copy_input_data()
         self.run_inference()
         self.copy_output_clean()
 
@@ -114,15 +115,23 @@ class IslesEnsemble:
 
         # Copy results
         if self.save_team_outputs:
-            shutil.copytree(os.path.join(self.ensemble_path, 'output_teams'),
+            shutil.copytree(os.path.join(self.tmp_out_dir, 'output'),
                             os.path.join(self.output_path, 'output_teams'))
-        shutil.copytree(os.path.join(self.ensemble_path, 'output'), os.path.join(self.output_path, 'ensemble_output'))
+
+        if not self.keep_tmp_files:
+            shutil.rmtree(self.tmp_out_dir)
+
+        # else:
+        #     shutil.copytree(os.path.join(self.tmp_out_dir, 'output', 'ensemble'),
+        #                     os.path.join(self.output_path, 'output'))
+
+#        shutil.copytree(os.path.join(self.ensemble_path, 'output'), os.path.join(self.output_path, 'ensemble_output'))
 
         # Remove intermediate files
-        shutil.rmtree(os.path.join(self.ensemble_path, 'output_teams'))
-        shutil.rmtree(os.path.join(self.ensemble_path, 'output'))
-        if os.path.exists(os.path.join(self.ensemble_path, 'input')):
-            shutil.rmtree(os.path.join(self.ensemble_path, 'input'))
+        # shutil.rmtree(os.path.join(self.ensemble_path, 'output_teams'))
+        # shutil.rmtree(os.path.join(self.ensemble_path, 'output'))
+        # if os.path.exists(os.path.join(self.ensemble_path, 'input')):
+        #     shutil.rmtree(os.path.join(self.ensemble_path, 'input'))
 
     def load_images(self):
         # Convert input files to NIfTI if needed
@@ -135,14 +144,16 @@ class IslesEnsemble:
 
     def extract_brain(self):
        # Code based on HD-BET
-       # Credits to Fabian Isensee et al
+       # Credits to Isensee et al (HBM 2019)
        # Git repo: https://github.com/MIC-DKFZ/HD-BET
 
         if self.skull_strip:
             if self.input_flair_path is not None:
-                print("Skull stripping FLAIR ...")
-                extract_brain(self.input_flair_path, os.path.join(self.tmp_out_dir, 'flair', 'flair_ss'))
-                self.input_flair_path = self.input_flair_path.replace('flair.nii.gz', 'flair_ss.nii.gz')
+                if not self.fast:
+                    print("Skull stripping FLAIR ...")
+                    extract_brain(self.input_flair_path, os.path.join(self.tmp_out_dir, 'flair', 'flair_ss'))
+                    self.input_flair_path = self.input_flair_path.replace('flair.nii.gz', 'flair_ss.nii.gz')
+
             print("Skull stripping DWI and ADC ...")
             extract_brain(self.input_dwi_path, os.path.join(self.tmp_out_dir, 'dwi', 'dwi_ss'), save_mask=1)
             self.input_dwi_path = self.input_dwi_path.replace('dwi.nii.gz', 'dwi_ss.nii.gz')
@@ -157,26 +168,36 @@ class IslesEnsemble:
 
     def run_inference(self):
         # Run SEALS Docker
+        # print_run('SEALS')
+        # conda_env_name = os.environ.get('CONDA_DEFAULT_ENV')
+        #
+        # # Construct the command to activate the conda environment and run the shell script
+        # path_seals = os.path.join(self.ensemble_path, 'SEALS/')
+        # command_seals = f'source activate {conda_env_name} && ./nnunet_launcher.sh {self.tmp_out_dir}'
+
+        # Run the command using subprocess
+#        subprocess.run(command_seals, shell=True, cwd=path_seals, executable="/bin/bash")
         print_run('SEALS')
-        path_seals = os.path.join(self.ensemble_path, 'SEALS/')
-        command_seals = f'{path_seals}nnunet_launcher.sh'
+        path_seals = self.ensemble_path + '/SEALS/'
+        command_seals = path_seals
+        command_seals += f'nnunet_launcher.sh {self.tmp_out_dir}'
         subprocess.run(command_seals, shell=True, cwd=path_seals)
 
         if self.input_flair_path is not None and not self.fast:
             # Run NVAUTO Docker
             print_run('NVAUTO')
             path_nvauto = os.path.join(self.ensemble_path, 'NVAUTO/')
-            command_nvauto = 'python process.py'
+            command_nvauto = f'python process.py --input_path {self.tmp_out_dir}'
             subprocess.run(command_nvauto, shell=True, cwd=path_nvauto)
 
             # Run SWAN Docker
             print_run('SWAN')
             path_factorizer = os.path.join(self.ensemble_path, 'FACTORIZER/')
-            command_factorizer = 'python process.py'
+            command_factorizer = f'python process.py --input_path {self.tmp_out_dir}'
             subprocess.run(command_factorizer, shell=True, cwd=path_factorizer)
 
         # Ensembling results
         path_voting = self.ensemble_path
-        command_voting = 'python majority_voting.py -i output_teams/ -o output/'
+        command_voting = f'python majority_voting.py -i {self.tmp_out_dir} -o {self.output_path} '
         subprocess.call(command_voting, shell=True, cwd=path_voting)
         print_completed(self.original_dwi_path)

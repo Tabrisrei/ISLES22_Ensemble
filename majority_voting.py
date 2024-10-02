@@ -32,29 +32,27 @@ class ISLES22():
         self.data_dict = {}
 
     def load_data(self):
-        dwi_folder    = 'dwi-brain-mri'
-        adc_folder    = 'adc-brain-mri'
-        #flair_folder  = 'flair-brain-mri'
-
+        dwi_folder    = 'dwi'
         self.dwi_path   = glob(os.path.join(self.root, dwi_folder, '*.nii.gz'))[0]
-        self.adc_path   = glob(os.path.join(self.root, adc_folder, '*.nii.gz'))[0]
-        #self.flair_path = glob(os.path.join(self.root, flair_folder, '*.nii.gz'))[0]
 
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', "--input_folder", required=True, help="folders contain ")
-    parser.add_argument('-o', "--output_folder", required=True, help="folder for saving evaluation csv")
+    parser.add_argument('-o', "--output_folder", required=True, help="folders contain ")
+    #parser.add_argument('--raw_data_dir', required=True, help="path to raw data directory")
+
     args = parser.parse_args()
 
     input_folder = args.input_folder
-    output_folder = args.output_folder
+    output_folder = args.output_folder #os.path.join(args.input_folder, 'output', 'ensemble')
+
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
     # load origin file path
-    raw_data_dir = 'input/images'
-    dataset_ISLES22 = ISLES22(raw_data_dir)
+    #raw_data_dir = os.path.join(args.input_folder, 'dwi')
+    dataset_ISLES22 = ISLES22(input_folder)
     dataset_ISLES22.load_data()
 
     # load image
@@ -65,9 +63,11 @@ if __name__=='__main__':
     #sub_folders = os.listdir(input_folder)
     teams = ['seals', 'nvauto', 'factorizer']
     pred_array = {}
-    for folder in teams :
+
+    for folder in teams:
         try:
-            pred_file = glob(os.path.join(input_folder, folder, '*.nii.gz'))[0]
+            #print(os.path.join(input_folder, 'output', folder, '*.nii.gz'))
+            pred_file = glob(os.path.join(input_folder, 'output', folder, '*.nii.gz'))[0]
             pred_image = sitk.ReadImage(pred_file)
             pred_array[folder] = sitk.GetArrayFromImage(pred_image).astype(np.int8)
         except:
