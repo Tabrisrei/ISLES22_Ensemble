@@ -30,7 +30,7 @@ import SimpleITK as sitk
 import scipy.stats as ss
 from skimage import transform
 from medpy.metric import dc, hd95
-
+import argparse
 from batchgenerators.utilities.file_and_folder_operations import *
 from nnunet.dataset_conversion.utils import generate_dataset_json
 from nnunet.paths import nnUNet_raw_data, preprocessing_output_dir
@@ -38,16 +38,33 @@ from nnunet.utilities.file_conversions import convert_2d_image_to_nifti
 
 class ISLES22():
     def __init__(self, root):
-        self.root  = root
+        self.root = root
         self.data_dict = {}
 
     def load_data(self):
-        dwi_folder = 'dwi-brain-mri'
-        adc_folder = 'adc-brain-mri'
-        flair_folder = 'flair-brain-mri'
-        self.dwi_path = glob(os.path.join(self.root, dwi_folder, '*.nii.gz'))[0]
-        self.adc_path = glob(os.path.join(self.root, adc_folder, '*.nii.gz'))[0]
-        self.flair_path = glob(os.path.join(self.root, flair_folder, '*.nii.gz'))[0]
+        dwi_folder = 'dwi'
+        adc_folder = 'adc'
+        # flair_folder  = 'flair-brain-mri'
+
+        # self.dwi_path = glob(os.path.join(self.root, dwi_folder, '*.nii.gz'))[0]
+        # self.adc_path = glob(os.path.join(self.root, adc_folder, '*.nii.gz'))[0]
+        # self.flair_path = glob(os.path.join(self.root, flair_folder, '*.nii.gz'))[0]
+
+        dwi_path = os.path.join(self.root, dwi_folder, dwi_folder + '.nii.gz')
+        ss_dwi_path = os.path.join(self.root, dwi_folder, dwi_folder + '_ss.nii.gz')
+        if os.path.exists(ss_dwi_path):
+            self.dwi_path = ss_dwi_path
+        elif os.path.exists(dwi_path):
+            self.dwi_path = dwi_path
+
+        adc_path = os.path.join(self.root, adc_folder, adc_folder + '.nii.gz')
+        ss_adc_path = os.path.join(self.root, adc_folder, adc_folder + '_ss.nii.gz')
+
+        if os.path.exists(ss_adc_path):
+            self.adc_path = ss_adc_path
+        elif os.path.exists(adc_path):
+            self.adc_path = adc_path
+#        self.flair_path = glob(os.path.join(self.root, flair_folder, '*.nii.gz'))[0]
 
 
 def respacing_file(image_file, target_spacing, resample_method):
@@ -135,10 +152,14 @@ def reimplement_resize(image_file, target_file, resample_method=sitk.sitkLinear)
 
 if __name__ == "__main__":
 
-    task_name = "Task500_Ischemic_Stroke_Test"
-    raw_data_dir = '../input/images'
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--raw_data_dir', type=str, required=True, help="Path to the raw data directory")
+    args = parser.parse_args()
+
+    raw_data_dir = args.raw_data_dir
     dataset_ISLES22 = ISLES22(raw_data_dir)
     dataset_ISLES22.load_data()
+    task_name = "Task500_Ischemic_Stroke_Test"
 
     target_base = join(nnUNet_raw_data, task_name)
     target_imagesTr = join(target_base, "imagesTr")
@@ -154,11 +175,9 @@ if __name__ == "__main__":
 
     dwi_file = respacing_file(dataset_ISLES22.dwi_path, target_spacing=[1, 1, 1], resample_method=sitk.sitkLinear)
     adc_file = reimplement_resize(dataset_ISLES22.adc_path, target_file=dwi_file, resample_method=sitk.sitkLinear)
-    # flair_file = reimplement_resize(dataset_ISLES22.flair_path, target_file=dwi_file, resample_method=sitk.sitkLinear)
 
     sitk.WriteImage(dwi_file,   join(target_imagesTs, 'ISLES22_' + '0001' + '_0000.nii.gz'))
     sitk.WriteImage(adc_file,   join(target_imagesTs, 'ISLES22_' + '0001' + '_0001.nii.gz'))
-    # sitk.WriteImage(flair_file, join(target_imagesTs, 'ISLES22_' + '0001' + '_0002.nii.gz'))
 
     generate_dataset_json(output_file=join(target_base, 'dataset.json'),
                           imagesTr_dir=target_imagesTr, 

@@ -9,17 +9,17 @@ from monai import transforms, data
 from monai.inferers import SlidingWindowInferer
 from monai.data.utils import decollate_batch
 import sys
+import argparse
 sys.path.append('.')
 
 
-DEFAULT_INPUT_PATH = Path("../input")
-DEFAULT_ALGORITHM_OUTPUT_IMAGES_PATH = Path("../output_teams/nvauto/")
+#DEFAULT_INPUT_PATH = Path("../input")
+#DEFAULT_ALGORITHM_OUTPUT_IMAGES_PATH = Path("../output_teams/nvauto/")
 
 # todo change with your team-name
 class ThresholdModel():
     def __init__(self,
-                 input_path: Path = DEFAULT_INPUT_PATH,
-                 output_path: Path = DEFAULT_ALGORITHM_OUTPUT_IMAGES_PATH):
+                 input_path: Path):
 
         self.debug = False  # False for running the docker!
         if self.debug:
@@ -30,7 +30,7 @@ class ThresholdModel():
 
         else:
             self._input_path = input_path
-            self._output_path = output_path
+            self._output_path = input_path / 'output' / 'nvauto'
             self._algorithm_output_path = self._output_path
             self._case_results = []
 
@@ -44,16 +44,13 @@ class ThresholdModel():
                 Binary mask encoding the lesion segmentation (0 background, 1 foreground).
         """
         # Get all image inputs.
-        dwi_image_path, adc_image_path, flair_image_path = input_data['dwi_image_path'],\
-                                                            input_data['adc_image_path'],\
-                                                            input_data['flair_image_path']
-
+        dwi_image_path, adc_image_path = input_data['dwi_image_path'],\
+                                                            input_data['adc_image_path']
 
         ##################
         np.set_printoptions(formatter={'float': '{: 0.3f}'.format}, suppress=True)
         torch.cuda.set_device(0)
         torch.backends.cudnn.benchmark = True
-
 
         load_keys=['image']
    
@@ -163,14 +160,11 @@ class ThresholdModel():
         Note: Cases missing the metadata will still have a json file, though their fields will be empty. """
 
         # Get MR data paths.
-        dwi_image_path = self.get_file_path(slug='dwi-brain-mri', filetype='image')
-        adc_image_path = self.get_file_path(slug='adc-brain-mri', filetype='image')
-        flair_image_path = self.get_file_path(slug='flair-brain-mri', filetype='image')
-
+        dwi_image_path = self.get_file_path(slug='dwi', filetype='image')
+        adc_image_path = self.get_file_path(slug='adc', filetype='image')
 
         input_data = {'dwi_image': SimpleITK.ReadImage(str(dwi_image_path)), 'dwi_image_path': str(dwi_image_path), 
-                      'adc_image': SimpleITK.ReadImage(str(adc_image_path)), 'adc_image_path': str(adc_image_path),
-                      'flair_image': SimpleITK.ReadImage(str(flair_image_path)), 'flair_image_path': str(flair_image_path)}
+                      'adc_image': SimpleITK.ReadImage(str(adc_image_path)), 'adc_image_path': str(adc_image_path)}
 
 
         # Set input information.
@@ -181,15 +175,18 @@ class ThresholdModel():
         """ Gets the path for each MR image/json file."""
 
         if filetype == 'image':
-            file_list = list((self._input_path / "images" / slug).glob("*.nii.gz"))
-        elif filetype == 'json':
-            file_list = list(self._input_path.glob("*{}.json".format(slug)))
+            # check if exist skull-stripped
+            #file_list = list((self._input_path / slug).glob("*.nii.gz"))
+            image_path = os.path.join(self._input_path, slug, slug + '.nii.gz')
+            ss_image_path = os.path.join(self._input_path, slug, slug + '_ss.nii.gz')
+            if os.path.exists(ss_image_path):
+                file_path = ss_image_path
+            elif os.path.exists(image_path):
+                file_path = image_path
+            else:
+                print('loading error')
 
-        # Check that there is a single file to load.
-        if len(file_list) != 1:
-            print('Loading error')
-        else:
-            return file_list[0]
+            return file_path
 
     def save(self):
         with open(str(self._output_file), "w") as f:
@@ -201,5 +198,9 @@ class ThresholdModel():
 
 
 if __name__ == "__main__":
-    # todo change with your team-name
-    ThresholdModel().process()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input_path', type=str, required=True, help="Path to the input data directory")
+    args = parser.parse_args()
+
+    input_path = Path(args.input_path)
+    ThresholdModel(input_path=input_path).process()

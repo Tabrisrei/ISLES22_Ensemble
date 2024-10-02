@@ -21,17 +21,32 @@ from batchgenerators.utilities.file_and_folder_operations import *
 
 class ISLES22():
     def __init__(self, root):
-        self.root  = root
+        self.root = root
         self.data_dict = {}
 
     def load_data(self):
-        dwi_folder    = 'dwi-brain-mri'
-        adc_folder    = 'adc-brain-mri'
-        #flair_folder  = 'flair-brain-mri'
+        dwi_folder = 'dwi'
+        adc_folder = 'adc'
+        # flair_folder  = 'flair-brain-mri'
 
-        self.dwi_path   = glob(os.path.join(self.root, dwi_folder, '*.nii.gz'))[0]
-        self.adc_path   = glob(os.path.join(self.root, adc_folder, '*.nii.gz'))[0]
-        #self.flair_path = glob(os.path.join(self.root, flair_folder, '*.nii.gz'))[0]
+        # self.dwi_path = glob(os.path.join(self.root, dwi_folder, '*.nii.gz'))[0]
+        # self.adc_path = glob(os.path.join(self.root, adc_folder, '*.nii.gz'))[0]
+        # self.flair_path = glob(os.path.join(self.root, flair_folder, '*.nii.gz'))[0]
+
+        dwi_path = os.path.join(self.root, dwi_folder, dwi_folder + '.nii.gz')
+        ss_dwi_path = os.path.join(self.root, dwi_folder, dwi_folder + '_ss.nii.gz')
+        if os.path.exists(ss_dwi_path):
+            self.dwi_path = ss_dwi_path
+        elif os.path.exists(dwi_path):
+            self.dwi_path = dwi_path
+
+        adc_path = os.path.join(self.root, adc_folder, adc_folder + '.nii.gz')
+        ss_adc_path = os.path.join(self.root, adc_folder, adc_folder + '_ss.nii.gz')
+
+        if os.path.exists(ss_adc_path):
+            self.adc_path = ss_adc_path
+        elif os.path.exists(adc_path):
+            self.adc_path = adc_path
 
 def reimplement_resize(image_file, target_file, resample_method=sitk.sitkLinear):
     """
@@ -96,6 +111,10 @@ if __name__=='__main__':
     parser.add_argument('-o', "--output_folder", required=True, help="folder for saving evaluation csv")
     parser.add_argument('-m', '--model_type', help='model_type, required.', required=True)
     parser.add_argument('-f', '--fold_index', default=0, help='evaluation_fold, required.', required=True)
+    parser.add_argument('--raw_data_dir', type=str, required=True, help="Path to the raw data directory")
+    args = parser.parse_args()
+
+    raw_data_dir = args.raw_data_dir
     args = parser.parse_args()
 
     input_folder   = args.input_folder
@@ -103,7 +122,7 @@ if __name__=='__main__':
     model_type     = args.model_type
     fold_index     = args.fold_index
 
-    raw_data_dir = '../input/images'
+    #raw_data_dir = '../input/images'
     dataset_ISLES22 = ISLES22(raw_data_dir)
     dataset_ISLES22.load_data()
 

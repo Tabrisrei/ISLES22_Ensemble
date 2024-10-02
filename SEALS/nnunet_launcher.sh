@@ -1,15 +1,16 @@
 #!/bin/bash
 
+# Accept raw_data_dir as the first argument to this script
+RAW_DATA_DIR=$1
+
 # Suppressing output of environment variable exports
 export nnUNet_raw_data_base="data/nnUNet_raw_data_base" >/dev/null 2>&1
 export nnUNet_preprocessed="data/nnUNet_preprocessed" >/dev/null 2>&1
 export RESULTS_FOLDER="../weights/SEALS/nnUNet_trained_models" >/dev/null 2>&1
 export nnUNet_n_proc_DA=24 >/dev/null 2>&1
 
-# Suppressing dataset conversion
-python nnunet/dataset_conversion/Task500_Ischemic_Stroke_Test.py >/dev/null 2>&1
+python nnunet/dataset_conversion/Task500_Ischemic_Stroke_Test.py --raw_data_dir "$RAW_DATA_DIR" >/dev/null 2>&1
 
-# Suppressing inference commands
 CUDA_VISIBLE_DEVICES=0 \
 nnUNet_predict \
                -i $nnUNet_raw_data_base/nnUNet_raw_data/Task500_Ischemic_Stroke_Test/imagesTs/ \
@@ -81,6 +82,7 @@ python recover_softmax.py \
                         -o test_result_recover/preliminary_phase/fold0 \
                         -m preliminary_phase \
                         -f fold0 \
+                        --raw_data_dir $RAW_DATA_DIR \
                         >/dev/null 2>&1
 
 python recover_softmax.py \
@@ -88,6 +90,7 @@ python recover_softmax.py \
                         -o test_result_recover/preliminary_phase/fold1 \
                         -m preliminary_phase \
                         -f fold1 \
+                        --raw_data_dir $RAW_DATA_DIR \
                         >/dev/null 2>&1
 
 python recover_softmax.py \
@@ -95,6 +98,7 @@ python recover_softmax.py \
                         -o test_result_recover/preliminary_phase/fold2 \
                         -m preliminary_phase \
                         -f fold2 \
+                        --raw_data_dir $RAW_DATA_DIR \
                         >/dev/null 2>&1
 
 python recover_softmax.py \
@@ -102,6 +106,7 @@ python recover_softmax.py \
                         -o test_result_recover/preliminary_phase/fold3 \
                         -m preliminary_phase \
                         -f fold3 \
+                        --raw_data_dir $RAW_DATA_DIR \
                         >/dev/null 2>&1
 
 python recover_softmax.py \
@@ -109,8 +114,8 @@ python recover_softmax.py \
                         -o test_result_recover/preliminary_phase/fold4 \
                         -m preliminary_phase \
                         -f fold4 \
+                        --raw_data_dir $RAW_DATA_DIR \
                         >/dev/null 2>&1
-
 # Suppressing ensemble softmax
 model_0=test_result_recover/preliminary_phase/fold0
 model_1=test_result_recover/preliminary_phase/fold1
@@ -128,8 +133,9 @@ python -m ensemble_predictions \
        --npz \
        >/dev/null 2>&1
 
-# Suppressing thresholding final output
+# Suppressing thresholding final output and passing the raw_data_dir
 python threshold_redirect.py \
                             -i test_ensemble/ \
-                            -o ../output_teams/seals/images/stroke-lesion-segmentation/ \
+                            -o ${RAW_DATA_DIR}/output/seals \
+                            --raw_data_dir $RAW_DATA_DIR \
                             >/dev/null 2>&1

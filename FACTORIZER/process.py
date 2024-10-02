@@ -4,18 +4,13 @@ import SimpleITK as sitk
 from pathlib import Path
 import numpy as np
 from predict import predict
-
-DEFAULT_INPUT_PATH = Path("../input")
-DEFAULT_ALGORITHM_OUTPUT_IMAGES_PATH = Path("../output_teams/factorizer/")
+import argparse
 
 
-# todo change with your team-name
 class Factorizer:
     def __init__(
         self,
-        input_path: Path = DEFAULT_INPUT_PATH,
-        output_path: Path = DEFAULT_ALGORITHM_OUTPUT_IMAGES_PATH,
-    ):
+        input_path: Path):
 
         self.debug = False  # False for running the docker!
         if self.debug:
@@ -25,7 +20,7 @@ class Factorizer:
 
         else:
             self._input_path = input_path
-            self._output_path = output_path
+            self._output_path = self._input_path / 'output' / 'factorizer'
             self._algorithm_output_path = self._output_path
 
     def predict(self, input_data):
@@ -79,13 +74,13 @@ class Factorizer:
 
         # Get MR data paths.
         dwi_image_path = self.get_file_path(
-            slug="dwi-brain-mri", filetype="image"
+            slug="dwi", filetype="image"
         )
         adc_image_path = self.get_file_path(
-            slug="adc-brain-mri", filetype="image"
+            slug="adc", filetype="image"
         )
         flair_image_path = self.get_file_path(
-            slug="flair-brain-mri", filetype="image"
+            slug="flair", filetype="image"
         )
 
 
@@ -102,18 +97,19 @@ class Factorizer:
     def get_file_path(self, slug, filetype="image"):
         """ Gets the path for each MR image/json file."""
 
-        if filetype == "image":
-            file_list = list(
-                (self._input_path / "images" / slug).glob("*.nii.gz")
-            )
-        elif filetype == "json":
-            file_list = list(self._input_path.glob("*{}.json".format(slug)))
+        if filetype == 'image':
+            # check if exist skull-stripped
+            # file_list = list((self._input_path / slug).glob("*.nii.gz"))
+            image_path = os.path.join(self._input_path, slug, slug + '.nii.gz')
+            ss_image_path = os.path.join(self._input_path, slug, slug + '_ss.nii.gz')
+            if os.path.exists(ss_image_path):
+                file_path = ss_image_path
+            elif os.path.exists(image_path):
+                file_path = image_path
+            else:
+                print('loading error')
 
-        # Check that there is a single file to load.
-        if len(file_list) != 1:
-            print("Loading error")
-        else:
-            return file_list[0]
+            return file_path
 
     def process(self):
         input_data, input_filename = self.load_isles_case()
@@ -121,4 +117,9 @@ class Factorizer:
 
 
 if __name__ == "__main__":
-    Factorizer().process()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input_path', type=str, required=True, help="Path to the input data directory")
+    args = parser.parse_args()
+
+    input_path = Path(args.input_path)
+    Factorizer(input_path=input_path).process()
