@@ -27,13 +27,16 @@ def stik_saver(origin_image, array, image_path):
 
 
 class ISLES22():
-    def __init__(self, root):
-        self.root  = root
+    def __init__(self, input_folder):
+        self.input_folder = input_folder  # Set input_folder as an instance attribute
         self.data_dict = {}
 
     def load_data(self):
-        self.dwi_path   = glob(os.path.join(self.input_folder, 'dwi', 'dwi.nii.gz'))[0]
-
+        # Ensure that there are files matching the pattern; otherwise, handle it properly
+        dwi_files = glob(os.path.join(self.input_folder, 'dwi', 'dwi.nii.gz'))
+        if len(dwi_files) == 0:
+            raise FileNotFoundError("No DWI file found in the specified input folder.")
+        self.dwi_path = dwi_files[0]
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
