@@ -177,8 +177,8 @@ class ThresholdModel():
         if filetype == 'image':
             # check if exist skull-stripped
             #file_list = list((self._input_path / slug).glob("*.nii.gz"))
-            image_path = os.path.join(self._input_path, slug, slug + '.nii.gz')
-            ss_image_path = os.path.join(self._input_path, slug, slug + '_ss.nii.gz')
+            image_path = os.path.join(self._input_path, slug, slug + '.nii.gz') #todo allow different formats
+            ss_image_path = os.path.join(self._input_path, slug, slug + '_ss.nii.gz') #todo allow different formats
             if os.path.exists(ss_image_path):
                 file_path = ss_image_path
             elif os.path.exists(image_path):

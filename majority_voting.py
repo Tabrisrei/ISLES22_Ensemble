@@ -33,9 +33,7 @@ class ISLES22():
 
     def load_data(self):
         # Ensure that there are files matching the pattern; otherwise, handle it properly
-        dwi_files = glob(os.path.join(self.input_folder, 'dwi', 'dwi.nii.gz'))
-        if len(dwi_files) == 0:
-            raise FileNotFoundError("No DWI file found in the specified input folder.")
+        dwi_files = glob(os.path.join(self.input_folder, 'dwi', 'dwi.*'))
         self.dwi_path = dwi_files[0]
 
 if __name__=='__main__':
