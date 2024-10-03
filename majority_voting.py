@@ -32,8 +32,7 @@ class ISLES22():
         self.data_dict = {}
 
     def load_data(self):
-        dwi_folder    = 'dwi'
-        self.dwi_path   = glob(os.path.join(self.root, dwi_folder, '*.nii.gz'))[0]
+        self.dwi_path   = glob(os.path.join(self.input_folder, 'dwi', 'dwi.nii.gz'))[0]
 
 
 if __name__=='__main__':
