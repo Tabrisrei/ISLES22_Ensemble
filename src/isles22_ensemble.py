@@ -8,9 +8,7 @@ import nibabel as nib
 import tempfile
 import warnings
 import numpy as np
-
-from majority_voting import ISLES22
-from utils import convert_to_nii, print_run, print_ensemble_message, print_completed, extract_brain, get_img_shape, save_nii
+from src.utils import convert_to_nii, print_run, print_ensemble_message, print_completed, extract_brain, get_img_shape, save_nii, check_gpu_memory
 from concurrent.futures import ThreadPoolExecutor
 
 class IslesEnsemble:
@@ -18,7 +16,7 @@ class IslesEnsemble:
         pass
 
     def predict_ensemble(self, ensemble_path, input_dwi_path, input_adc_path, output_path, input_flair_path=None,
-                         skull_strip=False, fast=False, save_team_outputs=False, parallelize=False):
+                         skull_strip=False, fast=False, save_team_outputs=False, parallelize=True):
         ''' Runs the Isles'22 Ensemble algorithm.
 
         Inputs:
@@ -52,10 +50,15 @@ class IslesEnsemble:
         self.skull_strip = skull_strip
         self.fast = fast
         self.save_team_outputs = save_team_outputs
-        self.parallelize = parallelize
         self.tmp_out_dir = tempfile.mkdtemp(prefix="tmp", dir="/tmp")
-        self.keep_tmp_files = False
-        #print(self.tmp_out_dir)
+        self.keep_tmp_files = True
+        gpu_avail = check_gpu_memory()
+        if parallelize and gpu_avail:                   # Unless intentional false, paralellize inference.
+            self.parallelize = True
+        else:
+            self.parallelize = False
+
+        print(self.tmp_out_dir)
         print_ensemble_message()
 
         self.load_images()
@@ -168,20 +171,20 @@ class IslesEnsemble:
 
         # SEALS Command
         print_run('SEALS')
-        path_seals = os.path.join(self.ensemble_path, 'SEALS/')
+        path_seals = os.path.join(self.ensemble_path, 'src', 'SEALS/')
         command_seals = f'./nnunet_launcher.sh {self.tmp_out_dir}'
         commands.append((command_seals, path_seals))
 
         if self.input_flair_path is not None and not self.fast:
             # NVAUTO Command
             print_run('NVAUTO')
-            path_nvauto = os.path.join(self.ensemble_path, 'NVAUTO/')
+            path_nvauto = os.path.join(self.ensemble_path, 'src', 'NVAUTO/')
             command_nvauto = f'python process.py --input_path {self.tmp_out_dir}'
             commands.append((command_nvauto, path_nvauto))
 
             # FACTORIZER Command
             print_run('SWAN')
-            path_factorizer = os.path.join(self.ensemble_path, 'FACTORIZER/')
+            path_factorizer = os.path.join(self.ensemble_path, 'src', 'FACTORIZER/')
             command_factorizer = f'python process.py --input_path {self.tmp_out_dir}'
             commands.append((command_factorizer, path_factorizer))
 
@@ -198,5 +201,5 @@ class IslesEnsemble:
     def ensemble(self):
         # Ensembling results
         path_voting = self.ensemble_path
-        command_voting = f'python majority_voting.py -i {self.tmp_out_dir} -o {self.output_path} '
+        command_voting = f'python ./src/majority_voting.py -i {self.tmp_out_dir} -o {self.output_path} '
         subprocess.call(command_voting, shell=True, cwd=path_voting)

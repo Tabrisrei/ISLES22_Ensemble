@@ -62,7 +62,7 @@ def write_plans_to_file(f, plans_file):
 
 
 if __name__ == "__main__":
-    base_dir = './'#preprocessing_output_dir''
+    base_dir = '/'  #preprocessing_output_dir''
     task_dirs = [i for i in subdirs(base_dir, join=False, prefix="Task") if i.find("BrainTumor") == -1 and i.find("MSSeg") == -1]
     print("found %d tasks" % len(task_dirs))
 

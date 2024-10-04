@@ -22,30 +22,34 @@ from batchgenerators.utilities.file_and_folder_operations import *
 from nnunet.dataset_conversion.utils import generate_dataset_json
 from nnunet.paths import nnUNet_raw_data
 
+
 class ISLES22():
-    def __init__(self, root):
-        self.root = root
+    def __init__(self, input_path):
+        self._input_path = input_path  # Initialize _input_path with the input path provided
         self.data_dict = {}
 
     def load_data(self):
         self.dwi_path = get_file_path(self, slug='dwi', filetype='image')
         self.adc_path = get_file_path(self, slug='adc', filetype='image')
 
-    def get_file_path(self, slug, filetype='image'):
-        """ Gets the path for each MR image/json file."""
-        if filetype == 'image':
-            # check if exist skull-stripped
-            #file_list = list((self._input_path / slug).glob("*.nii.gz"))
-            image_path = glob(os.path.join(self._input_path, slug, slug + '.*'))
-            ss_image_path = glob(os.path.join(self._input_path, slug, slug + '_ss.*'))
-            if len(ss_image_path)==1:
-                file_path = ss_image_path[0]
-            elif len(image_path)==1:
-                file_path = image_path[0]
-            else:
-                print('loading error')
 
-            return file_path
+def get_file_path(self, slug, filetype='image'):
+    """ Gets the path for each MR image/json file."""
+    if filetype == 'image':
+        # Check if the skull-stripped version exists first
+        ss_image_path = glob(os.path.join(self._input_path, slug, slug + '_ss.*'))
+        image_path = glob(os.path.join(self._input_path, slug, slug + '.*'))
+
+        if len(ss_image_path) == 1:
+            file_path = ss_image_path[0]
+        elif len(image_path) == 1:
+            file_path = image_path[0]
+        else:
+            raise FileNotFoundError(f"Error: No suitable file found for {slug} in {self._input_path}")
+
+        return file_path
+    else:
+        raise ValueError(f"Unsupported file type: {filetype}")
 
 def respacing_file(image_file, target_spacing, resample_method):
     """

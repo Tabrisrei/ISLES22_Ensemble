@@ -48,7 +48,7 @@ def predict(dwi, adc, flair):
     )
     dm.test_transform = test_transform
     dm.setup("test")
-    base_model_path = os.path.join(os.path.dirname(os.getcwd()), 'weights', 'FACTORIZER')
+    base_model_path = os.path.join(os.path.dirname(os.path.dirname(os.getcwd())), 'weights', 'FACTORIZER')
     # load (ensemble) model
     net_class = ft.Ensemble
     net_params = {

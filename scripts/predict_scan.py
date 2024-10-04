@@ -5,7 +5,7 @@ import os
 import sys
 ENSEMBLE_PATH = os.getcwd()                                                   # path-to-ensemble-repo
 sys.path.append(ENSEMBLE_PATH)
-from isles22_ensemble import IslesEnsemble
+from src.isles22_ensemble import IslesEnsemble
 
 # .nii/nii.gz/.mha/.dcm paths
 INPUT_FLAIR = os.path.join(ENSEMBLE_PATH, 'data', 'sub-strokecase0001_ses-0001_flair.nii.gz')  # path-to-FLAIR

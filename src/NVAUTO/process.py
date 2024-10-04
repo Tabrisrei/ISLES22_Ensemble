@@ -11,7 +11,7 @@ from monai.data.utils import decollate_batch
 import sys
 import argparse
 import glob
-sys.path.append('.')
+sys.path.append('')
 
 
 #DEFAULT_INPUT_PATH = Path("../input")
@@ -68,7 +68,7 @@ class ThresholdModel():
 
         validation_files = [{"image": [adc_image_path, dwi_image_path]}]
         #dirname = os.path.dirname(__file__)
-        dirname = os.path.dirname(os.getcwd())
+        dirname = os.path.dirname(os.path.dirname(os.getcwd()))
         val_ds = data.Dataset(data=validation_files, transform=val_transform)
         val_loader = data.DataLoader(val_ds, batch_size=1, shuffle=False, num_workers=0, sampler=None)
 
