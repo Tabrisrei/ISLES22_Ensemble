@@ -12,29 +12,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import pdb
-import shutil
-from glob import glob
-from pathlib import Path
 
-import string
-from tqdm import tqdm
-from typing import Tuple
-from copy import deepcopy
-from collections import OrderedDict
-from multiprocessing.pool import Pool
+from glob import glob
 
 import numpy as np
-import nibabel as nib
 import SimpleITK as sitk
-import scipy.stats as ss
-from skimage import transform
-from medpy.metric import dc, hd95
 import argparse
 from batchgenerators.utilities.file_and_folder_operations import *
 from nnunet.dataset_conversion.utils import generate_dataset_json
-from nnunet.paths import nnUNet_raw_data, preprocessing_output_dir
-from nnunet.utilities.file_conversions import convert_2d_image_to_nifti
+from nnunet.paths import nnUNet_raw_data
 
 class ISLES22():
     def __init__(self, root):
@@ -42,30 +28,24 @@ class ISLES22():
         self.data_dict = {}
 
     def load_data(self):
-        dwi_folder = 'dwi'
-        adc_folder = 'adc'
-        # flair_folder  = 'flair-brain-mri'
+        self.dwi_path = get_file_path(self, slug='dwi', filetype='image')
+        self.adc_path = get_file_path(self, slug='adc', filetype='image')
 
-        # self.dwi_path = glob(os.path.join(self.root, dwi_folder, '*.nii.gz'))[0]
-        # self.adc_path = glob(os.path.join(self.root, adc_folder, '*.nii.gz'))[0]
-        # self.flair_path = glob(os.path.join(self.root, flair_folder, '*.nii.gz'))[0]
+    def get_file_path(self, slug, filetype='image'):
+        """ Gets the path for each MR image/json file."""
+        if filetype == 'image':
+            # check if exist skull-stripped
+            #file_list = list((self._input_path / slug).glob("*.nii.gz"))
+            image_path = glob(os.path.join(self._input_path, slug, slug + '.*'))
+            ss_image_path = glob(os.path.join(self._input_path, slug, slug + '_ss.*'))
+            if len(ss_image_path)==1:
+                file_path = ss_image_path[0]
+            elif len(image_path)==1:
+                file_path = image_path[0]
+            else:
+                print('loading error')
 
-        dwi_path = os.path.join(self.root, dwi_folder, dwi_folder + '.nii.gz')
-        ss_dwi_path = os.path.join(self.root, dwi_folder, dwi_folder + '_ss.nii.gz')
-        if os.path.exists(ss_dwi_path):
-            self.dwi_path = ss_dwi_path
-        elif os.path.exists(dwi_path):
-            self.dwi_path = dwi_path
-
-        adc_path = os.path.join(self.root, adc_folder, adc_folder + '.nii.gz')
-        ss_adc_path = os.path.join(self.root, adc_folder, adc_folder + '_ss.nii.gz')
-
-        if os.path.exists(ss_adc_path):
-            self.adc_path = ss_adc_path
-        elif os.path.exists(adc_path):
-            self.adc_path = adc_path
-#        self.flair_path = glob(os.path.join(self.root, flair_folder, '*.nii.gz'))[0]
-
+            return file_path
 
 def respacing_file(image_file, target_spacing, resample_method):
     """
@@ -149,6 +129,7 @@ def reimplement_resize(image_file, target_file, resample_method=sitk.sitkLinear)
     # pdb.set_trace()
 
     return resampled_image_file
+
 
 if __name__ == "__main__":
 

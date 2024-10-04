@@ -10,6 +10,7 @@ from monai.inferers import SlidingWindowInferer
 from monai.data.utils import decollate_batch
 import sys
 import argparse
+import glob
 sys.path.append('.')
 
 
@@ -177,12 +178,12 @@ class ThresholdModel():
         if filetype == 'image':
             # check if exist skull-stripped
             #file_list = list((self._input_path / slug).glob("*.nii.gz"))
-            image_path = os.path.join(self._input_path, slug, slug + '.nii.gz') #todo allow different formats
-            ss_image_path = os.path.join(self._input_path, slug, slug + '_ss.nii.gz') #todo allow different formats
-            if os.path.exists(ss_image_path):
-                file_path = ss_image_path
-            elif os.path.exists(image_path):
-                file_path = image_path
+            image_path = glob.glob(os.path.join(self._input_path, slug, slug + '.*'))
+            ss_image_path = glob.glob(os.path.join(self._input_path, slug, slug + '_ss.*'))
+            if len(ss_image_path)==1:
+                file_path = ss_image_path[0]
+            elif len(image_path)==1:
+                file_path = image_path[0]
             else:
                 print('loading error')
 

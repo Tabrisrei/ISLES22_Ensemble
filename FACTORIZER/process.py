@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 from predict import predict
 import argparse
-
+import glob
 
 class Factorizer:
     def __init__(
@@ -94,18 +94,18 @@ class Factorizer:
         input_filename = str(dwi_image_path).split("/")[-1]
         return input_data, input_filename
 
-    def get_file_path(self, slug, filetype="image"):
+    def get_file_path(self, slug, filetype='image'):
         """ Gets the path for each MR image/json file."""
 
         if filetype == 'image':
             # check if exist skull-stripped
-            # file_list = list((self._input_path / slug).glob("*.nii.gz"))
-            image_path = os.path.join(self._input_path, slug, slug + '.nii.gz')
-            ss_image_path = os.path.join(self._input_path, slug, slug + '_ss.nii.gz')
-            if os.path.exists(ss_image_path):
-                file_path = ss_image_path
-            elif os.path.exists(image_path):
-                file_path = image_path
+            #file_list = list((self._input_path / slug).glob("*.nii.gz"))
+            image_path = glob.glob(os.path.join(self._input_path, slug, slug + '.*'))
+            ss_image_path = glob.glob(os.path.join(self._input_path, slug, slug + '_ss.*'))
+            if len(ss_image_path)==1:
+                file_path = ss_image_path[0]
+            elif len(image_path)==1:
+                file_path = image_path[0]
             else:
                 print('loading error')
 
