@@ -8,7 +8,10 @@ import nibabel as nib
 import tempfile
 import warnings
 import numpy as np
-from src.utils import convert_to_nii, print_run, print_ensemble_message, print_completed, extract_brain, get_img_shape, save_nii, check_gpu_memory
+import glob
+from src.utils import convert_to_nii, print_run, print_ensemble_message, print_completed, extract_brain, get_img_shape, \
+    save_nii, check_gpu_memory, register_mri, propagate_image, get_flair_atlas
+
 from concurrent.futures import ThreadPoolExecutor
 
 class IslesEnsemble:
@@ -16,7 +19,7 @@ class IslesEnsemble:
         pass
 
     def predict_ensemble(self, ensemble_path, input_dwi_path, input_adc_path, output_path, input_flair_path=None,
-                         skull_strip=False, fast=False, save_team_outputs=False, parallelize=True):
+                         skull_strip=False, fast=False, save_team_outputs=False, parallelize=True, results_mni=False):
         ''' Runs the Isles'22 Ensemble algorithm.
 
         Inputs:
@@ -50,24 +53,31 @@ class IslesEnsemble:
         self.skull_strip = skull_strip
         self.fast = fast
         self.save_team_outputs = save_team_outputs
+        self.results_mni = results_mni
         self.tmp_out_dir = tempfile.mkdtemp(prefix="tmp", dir="/tmp")
+        self.mni_flair_path = os.path.join(ensemble_path, 'data', 'atlas', 'flair_mni.nii.gz')
+        self.ensemble_mask_path = os.path.join(output_path, 'lesion_msk.nii.gz')
         self.keep_tmp_files = True
+
         gpu_avail = check_gpu_memory()
         if parallelize and gpu_avail:                   # Unless intentional false, paralellize inference.
             self.parallelize = True
         else:
             self.parallelize = False
-
-        print(self.tmp_out_dir)
+        #print(self.tmp_out_dir)
         print_ensemble_message()
 
+
+        # proicess
         self.load_images()
         self.check_images()
         self.extract_brain()
         #self.copy_input_data()
         self.inference()
-        self.copy_output_clean()
         self.ensemble()
+        self.register_mni()
+        self.copy_output_clean()
+
 
         print_completed(self.original_dwi_path)
 
@@ -125,6 +135,10 @@ class IslesEnsemble:
         if self.save_team_outputs:
             shutil.copytree(os.path.join(self.tmp_out_dir, 'output'),
                             os.path.join(self.output_path, 'output_teams'))
+        if self.results_mni:
+            os.mkdir(os.path.join(self.output_path, 'output_mni'))
+            for nii_file in glob.glob(os.path.join(self.tmp_out_dir, 'mni', '*.nii.gz')):
+                shutil.copyfile(nii_file, os.path.join(self.output_path, 'output_mni', nii_file.split('/')[-1]))
 
         if not self.keep_tmp_files:
             shutil.rmtree(self.tmp_out_dir)
@@ -145,21 +159,38 @@ class IslesEnsemble:
 
         if self.skull_strip:
             if self.input_flair_path is not None:
-                if not self.fast:
-                    print("Skull stripping FLAIR ...")
-                    extract_brain(self.input_flair_path, os.path.join(self.tmp_out_dir, 'flair', 'flair_ss'))
-                    self.input_flair_path = self.input_flair_path.replace('flair.nii.gz', 'flair_ss.nii.gz')
+                #if not self.fast:
+                print("Skull stripping FLAIR ...")
+                extract_brain(input_path=self.input_flair_path,
+                              output_path=os.path.join(self.tmp_out_dir, 'flair', 'flair_ss'),
+                              gpu=1, save_mask=1)
+                self.input_flair_path = self.input_flair_path.replace('flair.nii.gz', 'flair_ss.nii.gz')
+                self.register_images() # Flair + brain_msk to dwi
 
-            print("Skull stripping DWI and ADC ...")
-            extract_brain(self.input_dwi_path, os.path.join(self.tmp_out_dir, 'dwi', 'dwi_ss'), save_mask=1)
-            self.input_dwi_path = self.input_dwi_path.replace('dwi.nii.gz', 'dwi_ss.nii.gz')
-            dwi_msk_path = self.input_dwi_path.replace('dwi_ss.nii.gz', 'dwi_ss_mask.nii.gz')
-            dwi_msk_nii = nib.load(dwi_msk_path)
+                # brian-mask dwi and adc
+                brain_msk = 1*nib.load(self.reg_brain_mask).get_data()
+                adc_data = nib.load(self.input_adc_path).get_fdata()
+                dwi_msk_nii = nib.load(self.input_dwi_path)
+                # save dwi ss
+                dwi_data = dwi_msk_nii.get_fdata() * brain_msk
+                self.input_dwi_path = self.input_dwi_path.replace('dwi.nii.gz', 'dwi_ss.nii.gz')
+                save_nii(dwi_data, dwi_msk_nii.affine, dwi_msk_nii.header, self.input_dwi_path)
 
-            adc_obj = nib.load(self.input_adc_path)
-            adc_data = adc_obj.get_fdata() * dwi_msk_nii.get_fdata()
-            self.input_adc_path = self.input_adc_path.replace('adc.nii.gz', 'adc_ss.nii.gz')
-            save_nii(adc_data, dwi_msk_nii.affine, dwi_msk_nii.header, self.input_adc_path)
+                # save adc ss
+                adc_data = adc_data * brain_msk
+                self.input_adc_path = self.input_adc_path.replace('adc.nii.gz', 'adc_ss.nii.gz')
+                save_nii(adc_data, dwi_msk_nii.affine, dwi_msk_nii.header, self.input_adc_path)
+
+            else: # no flair available- use hd-bet
+                print("Skull stripping DWI and ADC ...")
+                extract_brain(self.input_dwi_path, os.path.join(self.tmp_out_dir, 'dwi', 'dwi_ss'), save_mask=1)
+                self.input_dwi_path = self.input_dwi_path.replace('dwi.nii.gz', 'dwi_ss.nii.gz')
+                dwi_msk_nii = self.input_dwi_path.replace('dwi_ss.nii.gz', 'dwi_ss_mask.nii.gz')
+
+                adc_obj = nib.load(self.input_adc_path)
+                adc_data = adc_obj.get_fdata() * dwi_msk_nii.get_fdata()
+                self.input_adc_path = self.input_adc_path.replace('adc.nii.gz', 'adc_ss.nii.gz')
+                save_nii(adc_data, dwi_msk_nii.affine, dwi_msk_nii.header, self.input_adc_path)
 
     @staticmethod
     def run_command(command, cwd):
@@ -203,3 +234,24 @@ class IslesEnsemble:
         path_voting = self.ensemble_path
         command_voting = f'python ./src/majority_voting.py -i {self.tmp_out_dir} -o {self.output_path} '
         subprocess.call(command_voting, shell=True, cwd=path_voting)
+
+    def register_images(self):
+        os.mkdir(self.tmp_out_dir+'/flair/reg')
+        brain_msk_path = os.path.join(self.tmp_out_dir, 'flair', 'flair_ss_mask.nii.gz')
+        register_mri(self.input_dwi_path, self.input_flair_path, self.tmp_out_dir+'/flair/reg/flair_ss_reg.nii.gz')
+        propagate_image(brain_msk_path, self.tmp_out_dir+'/flair/reg/brain_msk_reg.nii.gz', is_mask=True)
+
+        self.reg_flair = os.path.join(self.tmp_out_dir, 'flair', 'reg', 'flair_ss_reg.nii.gz')
+        self.reg_brain_mask = os.path.join(self.tmp_out_dir, 'flair', 'reg', 'brain_msk_reg.nii.gz')
+
+    def register_mni(self):
+        if not os.path.exists(os.path.dirname(self.mni_flair_path)):
+            os.mkdir(os.path.dirname(self.mni_flair_path))
+        get_flair_atlas(self.mni_flair_path)
+
+        if self.results_mni:
+            os.mkdir(self.tmp_out_dir + '/mni')
+            register_mri(self.mni_flair_path, self.reg_flair, self.tmp_out_dir + '/mni/flair-mni.nii.gz') # flair to mani
+            propagate_image(self.input_dwi_path, self.tmp_out_dir + '/mni/dwi-mni.nii.gz', is_mask=False)
+            propagate_image(self.input_adc_path, self.tmp_out_dir + '/mni/adc-mni.nii.gz', is_mask=False)
+            propagate_image(self.ensemble_mask_path, self.tmp_out_dir + '/mni/lesion_msk-mni.nii.gz', is_mask=True)

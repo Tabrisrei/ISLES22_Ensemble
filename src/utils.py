@@ -9,6 +9,9 @@ import subprocess
 from colorama import Fore, Style, init
 import textwrap
 import nibabel as nib
+import SimpleITK as sitk
+import os
+import requests
 
 #import warnings
 # Initialize colorama for cross-platform support
@@ -133,6 +136,71 @@ def check_gpu_memory(min_free_memory_gb=12):
 #    shutil.
 
 
+def register_mri(fixed_image_path, moving_image_path, out_dir_path):
+    # Set up the ElastixImageFilter
+    fixed_image = sitk.ReadImage(fixed_image_path)
+    moving_image = sitk.ReadImage(moving_image_path)
+
+    elastix = sitk.ElastixImageFilter()
+    elastix.SetFixedImage(fixed_image)
+    elastix.SetMovingImage(moving_image)
+    elastix.SetOutputDirectory(os.path.dirname(out_dir_path))
+
+    elastix.SetParameterMap(sitk.GetDefaultParameterMap("rigid"))
+    elastix.LogToConsoleOff()
+    elastix.LogToFileOff()
+    #elastix.AddParameterMap(sitk.GetDefaultParameterMap("affine"))
+
+    elastix.Execute()
+
+    reg_image = elastix.GetResultImage()
+
+    # Optionally, save the registered image
+    sitk.WriteImage(reg_image, out_dir_path)
+    # Execute the registration
+
+def propagate_image(mask_image_path, out_dir_path, is_mask = False):
+    mask_image = sitk.ReadImage(mask_image_path)
+    transform_param_files = glob.glob(os.path.join(os.path.dirname(out_dir_path), 'TransformParameters.*.txt'))
+
+    for param_file in transform_param_files:
+        # Read the parameter map and set nearest neighbor interpolator for binary masks
+        transform_param_map = sitk.ReadParameterFile(param_file)
+        if is_mask:
+            transform_param_map['ResampleInterpolator'] = ['FinalNearestNeighborInterpolator']
+
+        # Apply the transformation using Transformix
+        transformix = sitk.TransformixImageFilter()
+        transformix.SetMovingImage(mask_image)
+        transformix.SetTransformParameterMap(transform_param_map)
+        transformix.LogToConsoleOff()
+        transformix.LogToFileOff()
+        # Execute the transformation
+        transformix.Execute()
+
+        # Get the transformed mask image for the next iteration
+        mask_image = transformix.GetResultImage()
+    # Save the final transformed binary mask
+    sitk.WriteImage(mask_image, out_dir_path)
+
+
+
+
+
+def get_flair_atlas(output_path):
+    '''    Get a FLAIR-MNI vascular territory atlas from https://zenodo.org/records/3379848
+    https://www.frontiersin.org/journals/neurology/articles/10.3389/fneur.2019.00208/full   '''
+
+    url_flair = url = "https://zenodo.org/record/3379848/files/caa_flair_in_mni_template_smooth_brain_intres.nii.gz?download=1"
+
+    # Download the file if it does not exist
+    if not os.path.exists(output_path):
+        print('Getting vascular territory atlas. If you use it, please cite:')
+        print(' Schirmer, Markus D., et al. "Spatial signature of white matter hyperintensities in stroke patients." Frontiers in neurology 10 (2019): 208.')
+
+        response = requests.get(url_flair)
+        with open(output_path, 'wb') as f:
+            f.write(response.content)
 
 
 if __name__ == '__main__':
