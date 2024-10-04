@@ -33,10 +33,10 @@ conda activate isles_ensemble
 conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=11.3 -c pytorch
 conda install -c conda-forge openslide-python
 conda install python=3.8.0 # important, since pytorch triggers the installation of later python versions
-pip install -e SEALS/
-pip install -e FACTORIZER/model/factorizer/
-pip install -r requirements.txt
+pip install -e ./src/SEALS/
+pip install -e ./src/FACTORIZER/model/factorizer/
 pip install -e ./HD-BET
+pip install -r requirements.txt
 
 ```
 
