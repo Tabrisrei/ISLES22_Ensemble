@@ -134,4 +134,4 @@ Please contact Ezequiel de la Rosa (ezequiel.delarosa@uzh.ch).
 ## Acknowledgement
 - We thank all ISLES'22 challenge participants, collaborators and organizers for allowing this work to happen. We also thank all developers and maintaners of the repos herein used. 
 - Skull-stripping is done with [HD-BET](https://github.com/MIC-DKFZ/HD-BET).
-- The used FLAIR-MNI atlas is obtained from [this paper] (https://www.frontiersin.org/journals/neurology/articles/10.3389/fneur.2019.00208/full) (https://zenodo.org/records/3379848). 
+- The used FLAIR-MNI atlas is obtained from [this paper](https://www.frontiersin.org/journals/neurology/articles/10.3389/fneur.2019.00208/full) (https://zenodo.org/records/3379848). 
