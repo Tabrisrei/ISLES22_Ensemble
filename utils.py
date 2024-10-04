@@ -103,6 +103,33 @@ def extract_brain(input_path, output_path, gpu=True, save_mask=0):
         subprocess.call(command_hd_bet, shell=True, stderr=devnull)
 
 
+def check_gpu_memory(min_free_memory_gb=12):
+    try:
+        # Run the `nvidia-smi` command to get GPU memory details
+        result = subprocess.run(
+            ["nvidia-smi", "--query-gpu=memory.free", "--format=csv,noheader,nounits"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True
+        )
+
+        # Parse the output
+        free_memory_list = result.stdout.strip().split("\n")
+        free_memory_list = [int(mem) for mem in free_memory_list]  # Convert memory values to integers (in MB)
+
+        # Check if any GPU has sufficient free memory
+        for free_memory_mb in free_memory_list:
+            free_memory_gb = free_memory_mb / 1024  # Convert MB to GB
+            print(free_memory_gb)
+            if free_memory_gb >= min_free_memory_gb:
+                return True
+
+        return False
+
+    except subprocess.CalledProcessError as e:
+        print(f"Error occurred while trying to check GPU memory: {e.stderr}")
+        return False
 #    shutil.
 
 
