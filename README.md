@@ -35,7 +35,7 @@ conda install -c conda-forge openslide-python
 conda install python=3.8.0 # important, since pytorch triggers the installation of later python versions
 pip install -e ./src/SEALS/
 pip install -e ./src/FACTORIZER/model/factorizer/
-pip install -e ./HD-BET
+pip install -e ./src/HD-BET
 pip install -r requirements.txt
 
 ```
