@@ -93,7 +93,7 @@ stroke_segm.predict_ensemble(ensemble_path=ENSEMBLE_PATH,
 
 - **`skull_strip`**: `True`/`False` (default: `False`) — Perform skull stripping on input images.
 - **`fast`**: `True`/`False` (default: `False`) — Run a single model for faster execution.
-- **`parallelize`**: `True`/`False` (default: `False`) — Up to 50% faster inference on GPUs with ≥12 GB memory.
+- **`parallelize`**: `True`/`False` (default: `True`) — Up to 50% faster inference on GPUs with ≥12 GB memory.
 - **`save_team_outputs`**: `True`/`False` (default: `False`) — Save outputs of individual models before ensembling.
 
 
