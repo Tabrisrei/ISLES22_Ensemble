@@ -255,16 +255,25 @@ class IslesEnsemble:
 
         if self.results_mni:
             os.mkdir(self.tmp_out_dir + '/mni')
-            if not self.extract_brain(): # first register flair to dwi if ss not done-  later propagate all images
+            if not self.skull_strip: # first register flair to dwi if ss not done-  later propagate all images
                 self.reg_flair = self.tmp_out_dir + '/flair/flair_ss_reg.nii.gz'
                 register_mri(self.input_dwi_path, self.input_flair_path,
                              self.reg_flair)
+                mask_path = None
+            else:
+                mask_path = self.tmp_out_dir + '/mni/brain_msk-mni.nii.gz'
 
+
+            # register native->mni
             register_mri(self.mni_flair_path, self.reg_flair, self.tmp_out_dir + '/mni/flair-mni.nii.gz', transformation='affine') # flair to mni
             propagate_image(self.input_dwi_path, self.tmp_out_dir + '/mni/dwi-mni.nii.gz', is_mask=False)
             propagate_image(self.input_adc_path, self.tmp_out_dir + '/mni/adc-mni.nii.gz', is_mask=False)
             propagate_image(self.ensemble_mask_path, self.tmp_out_dir + '/mni/lesion_msk-mni.nii.gz', is_mask=True)
 
-            # out_qc_path = os.path.join('/home/edelarosa/Documents/qc_isles22_ensemble', self.original_dwi_path.split('/')[-3] + '.png')
-            # registration_qc([self.tmp_out_dir + '/mni/dwi-mni.nii.gz', self.tmp_out_dir + '/mni/flair-mni.nii.gz', self.mni_flair_path],
-            #                 out_qc_path)
+            if self.skull_strip:
+                propagate_image(self.reg_brain_mask, self.tmp_out_dir + '/mni/brain_msk-mni.nii.gz', is_mask=True)
+
+            out_qc_path = os.path.join(os.path.dirname(self.output_path), 'qc', self.original_dwi_path.split('/')[-3] + '.png')
+            registration_qc([self.tmp_out_dir + '/mni/dwi-mni.nii.gz', self.tmp_out_dir + '/mni/adc-mni.nii.gz',
+                             self.tmp_out_dir + '/mni/flair-mni.nii.gz', self.mni_flair_path],
+                            out_qc_path, mask_path)
