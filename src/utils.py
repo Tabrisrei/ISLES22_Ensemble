@@ -12,7 +12,8 @@ import nibabel as nib
 import SimpleITK as sitk
 import os
 import requests
-
+from matplotlib import pyplot as plt
+import numpy as np
 #import warnings
 # Initialize colorama for cross-platform support
 init(autoreset=True)
@@ -136,7 +137,7 @@ def check_gpu_memory(min_free_memory_gb=12):
 #    shutil.
 
 
-def register_mri(fixed_image_path, moving_image_path, out_dir_path):
+def register_mri(fixed_image_path, moving_image_path, out_dir_path, transformation='rigid'):
     # Set up the ElastixImageFilter
     fixed_image = sitk.ReadImage(fixed_image_path)
     moving_image = sitk.ReadImage(moving_image_path)
@@ -146,7 +147,7 @@ def register_mri(fixed_image_path, moving_image_path, out_dir_path):
     elastix.SetMovingImage(moving_image)
     elastix.SetOutputDirectory(os.path.dirname(out_dir_path))
 
-    elastix.SetParameterMap(sitk.GetDefaultParameterMap("rigid"))
+    elastix.SetParameterMap(sitk.GetDefaultParameterMap(transformation))
     elastix.LogToConsoleOff()
     elastix.LogToFileOff()
     #elastix.AddParameterMap(sitk.GetDefaultParameterMap("affine"))
@@ -202,6 +203,49 @@ def get_flair_atlas(output_path):
         with open(output_path, 'wb') as f:
             f.write(response.content)
 
+
+def registration_qc(image_paths, output_path, mask_path=None):
+    # Load mask if provided
+    if mask_path is not None:
+        brain = nib.load(mask_path).get_fdata()
+    else:
+        brain = None
+
+    # Load images
+    images = [nib.load(img_path).get_fdata() for img_path in image_paths]
+
+    # Set brain mask if mask not provided
+    if brain is None:
+        brain = 1.0 * (images[1] > 0.1)  # Use first image as mask reference
+    brain[brain == 0] = np.nan  # Replace zeroes with NaN for transparency
+
+    # Get the number of images
+    num_images = len(images)
+
+    # Calculate the central slice
+    central_slice = round(images[0].shape[-1] / 2)
+
+    # Set up the figure size dynamically based on number of images
+    plt.figure(figsize=(5 * num_images, 5), dpi=80, facecolor='black')
+    plt.style.use("dark_background")
+    plt.subplots_adjust(left=0.01,
+                        bottom=0.01,
+                        right=0.99,
+                        top=0.99,
+                        wspace=0.1,
+                        hspace=0)
+
+    # Plot each image with the mask overlay
+    for i, img in enumerate(images):
+        plt.subplot(1, num_images, i + 1)
+        plt.imshow(np.rot90(img[:, :, central_slice]), 'gray')
+        plt.imshow(np.rot90(brain[:, :, central_slice]), 'Accent', interpolation='none', alpha=0.3)
+        plt.axis('off')
+
+    # Show and save the figure
+    plt.show()
+    plt.savefig(output_path)
+    plt.close('all')
 
 if __name__ == '__main__':
     convert_to_nii('dwi', '/home/edelarosa/Documents/datasets/dwi_dcm')

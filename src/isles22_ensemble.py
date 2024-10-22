@@ -10,7 +10,7 @@ import warnings
 import numpy as np
 import glob
 from src.utils import convert_to_nii, print_run, print_ensemble_message, print_completed, extract_brain, get_img_shape, \
-    save_nii, check_gpu_memory, register_mri, propagate_image, get_flair_atlas
+    save_nii, check_gpu_memory, register_mri, propagate_image, get_flair_atlas, registration_qc
 
 from concurrent.futures import ThreadPoolExecutor
 
@@ -57,7 +57,7 @@ class IslesEnsemble:
         self.tmp_out_dir = tempfile.mkdtemp(prefix="tmp", dir="/tmp")
         self.mni_flair_path = os.path.join(ensemble_path, 'data', 'atlas', 'flair_mni.nii.gz')
         self.ensemble_mask_path = os.path.join(output_path, 'lesion_msk.nii.gz')
-        self.keep_tmp_files = True
+        self.keep_tmp_files = False
 
         gpu_avail = check_gpu_memory()
         if parallelize and gpu_avail:                   # Unless intentional false, paralellize inference.
@@ -181,6 +181,10 @@ class IslesEnsemble:
                 self.input_adc_path = self.input_adc_path.replace('adc.nii.gz', 'adc_ss.nii.gz')
                 save_nii(adc_data, dwi_msk_nii.affine, dwi_msk_nii.header, self.input_adc_path)
 
+                # out_qc_path = os.path.join('/home/edelarosa/Documents/qc_isles22_ensemble', self.original_dwi_path.split('/')[-3] + '.png')
+                # registration_qc(self.original_dwi_path, self.reg_flair,
+                #                 self.reg_brain_mask, out_qc_path)
+
             else: # no flair available- use hd-bet
                 print("Skull stripping DWI and ADC ...")
                 extract_brain(self.input_dwi_path, os.path.join(self.tmp_out_dir, 'dwi', 'dwi_ss'), save_mask=1)
@@ -251,7 +255,16 @@ class IslesEnsemble:
 
         if self.results_mni:
             os.mkdir(self.tmp_out_dir + '/mni')
-            register_mri(self.mni_flair_path, self.reg_flair, self.tmp_out_dir + '/mni/flair-mni.nii.gz') # flair to mani
+            if not self.extract_brain(): # first register flair to dwi if ss not done-  later propagate all images
+                self.reg_flair = self.tmp_out_dir + '/flair/flair_ss_reg.nii.gz'
+                register_mri(self.input_dwi_path, self.input_flair_path,
+                             self.reg_flair)
+
+            register_mri(self.mni_flair_path, self.reg_flair, self.tmp_out_dir + '/mni/flair-mni.nii.gz', transformation='affine') # flair to mni
             propagate_image(self.input_dwi_path, self.tmp_out_dir + '/mni/dwi-mni.nii.gz', is_mask=False)
             propagate_image(self.input_adc_path, self.tmp_out_dir + '/mni/adc-mni.nii.gz', is_mask=False)
             propagate_image(self.ensemble_mask_path, self.tmp_out_dir + '/mni/lesion_msk-mni.nii.gz', is_mask=True)
+
+            # out_qc_path = os.path.join('/home/edelarosa/Documents/qc_isles22_ensemble', self.original_dwi_path.split('/')[-3] + '.png')
+            # registration_qc([self.tmp_out_dir + '/mni/dwi-mni.nii.gz', self.tmp_out_dir + '/mni/flair-mni.nii.gz', self.mni_flair_path],
+            #                 out_qc_path)
