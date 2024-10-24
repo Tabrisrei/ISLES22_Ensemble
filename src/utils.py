@@ -17,8 +17,10 @@ import numpy as np
 #import warnings
 # Initialize colorama for cross-platform support
 init(autoreset=True)
-columns = os.get_terminal_size().columns
-
+try:
+    columns = os.get_terminal_size().columns
+except:
+    columns = 80
 
 def print_completed(mypath):
     print(Fore.GREEN + Style.BRIGHT + f'Finished: {mypath}')
