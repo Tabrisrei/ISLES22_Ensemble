@@ -229,7 +229,7 @@ def registration_qc(image_paths, output_path, mask_path=None):
 
     # Set up the figure size dynamically based on number of images
     plt.figure(figsize=(5 * num_images, 5), dpi=80, facecolor='black')
-    plt.style.use("dark_background")
+    #plt.style.use("dark_background")
     plt.subplots_adjust(left=0.01,
                         bottom=0.01,
                         right=0.99,
@@ -245,9 +245,10 @@ def registration_qc(image_paths, output_path, mask_path=None):
         plt.axis('off')
 
     # Show and save the figure
-    plt.show()
     plt.savefig(output_path)
-    plt.close('all')
+    #plt.show()
+
+    #plt.close('all')
 
 if __name__ == '__main__':
     convert_to_nii('dwi', '/home/edelarosa/Documents/datasets/dwi_dcm')
