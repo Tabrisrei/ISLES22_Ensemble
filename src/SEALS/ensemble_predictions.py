@@ -19,7 +19,7 @@ import SimpleITK as sitk
 from batchgenerators.utilities.file_and_folder_operations import *
 import numpy as np
 from multiprocessing import Pool
-from src.SEALS.nnunet.postprocessing.connected_components import apply_postprocessing_to_folder, load_postprocessing
+from nnunet.postprocessing.connected_components import apply_postprocessing_to_folder, load_postprocessing
 
 def save_segmentation_nifti_from_softmax(segmentation_softmax: Union[str, np.ndarray], 
                                          out_fname: str,
