@@ -127,7 +127,7 @@ def check_gpu_memory(min_free_memory_gb=12):
         # Check if any GPU has sufficient free memory
         for free_memory_mb in free_memory_list:
             free_memory_gb = free_memory_mb / 1024  # Convert MB to GB
-            print(free_memory_gb)
+            #print(free_memory_gb)
             if free_memory_gb >= min_free_memory_gb:
                 return True
 

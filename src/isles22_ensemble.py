@@ -64,7 +64,6 @@ class IslesEnsemble:
             self.parallelize = True
         else:
             self.parallelize = False
-        #print(self.tmp_out_dir)
         print_ensemble_message()
 
 
@@ -181,9 +180,8 @@ class IslesEnsemble:
                 self.input_adc_path = self.input_adc_path.replace('adc.nii.gz', 'adc_ss.nii.gz')
                 save_nii(adc_data, dwi_msk_nii.affine, dwi_msk_nii.header, self.input_adc_path)
 
-                # out_qc_path = os.path.join('/home/edelarosa/Documents/qc_isles22_ensemble', self.original_dwi_path.split('/')[-3] + '.png')
-                # registration_qc(self.original_dwi_path, self.reg_flair,
-                #                 self.reg_brain_mask, out_qc_path)
+                #out_qc_path = os.path.join('/home/edelarosa/Documents/qc_isles22_ensemble', self.original_dwi_path.split('/')[-3] + '.png')
+                #registration_qc([self.original_dwi_path, self.reg_flair], out_qc_path, self.reg_brain_mask)
 
             else: # no flair available- use hd-bet
                 print("Skull stripping DWI and ADC ...")
