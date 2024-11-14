@@ -89,6 +89,16 @@ stroke_segm.predict_ensemble(ensemble_path=ENSEMBLE_PATH,
                  output_path=OUTPUT_PATH)
 ```
 
+Docker
+Requirements: 
+- [Docker](https://docs.docker.com/engine/install/) and [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+- Download the Docker image or build it as  ```bash docker build -t isles .```
+
+Docker usage: 
+```bash
+docker run --gpus all -v /*path*/ISLES22_Ensemble/data:/app/data isles --dwi_file_name sub-strokecase0001_ses-0001_dwi.nii.gz --adc_file_name sub-strokecase0001_ses-0001_adc.nii.gz --flair_file_name sub-strokecase0001_ses-0001_flair.nii.gz
+```
+
 ### Extra Parameters
 
 - **`skull_strip`**: `True`/`False` (default: `False`) — Perform skull stripping on input images.
