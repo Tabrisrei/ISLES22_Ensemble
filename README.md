@@ -68,7 +68,7 @@ ISLES22_Ensemble/
 - **FLAIR**: Required for ensemble (optional for single algorithm outputs)
 
 
-From Python
+### Python
 
 ```bash
 ENSEMBLE_PATH = 'path-to-isles-ensemble-repo' 
@@ -89,7 +89,8 @@ stroke_segm.predict_ensemble(ensemble_path=ENSEMBLE_PATH,
                  output_path=OUTPUT_PATH)
 ```
 
-Docker
+### Docker
+
 Requirements: 
 - [Docker](https://docs.docker.com/engine/install/) and [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 - Download the Docker image or build it as  ```bash docker build -t isles .```
