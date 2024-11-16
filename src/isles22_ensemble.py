@@ -139,6 +139,9 @@ class IslesEnsemble:
             for nii_file in glob.glob(os.path.join(self.tmp_out_dir, 'mni', '*.nii.gz')):
                 shutil.copyfile(nii_file, os.path.join(self.output_path, 'output_mni', nii_file.split('/')[-1]))
 
+            for png_file in glob.glob(os.path.join(self.tmp_out_dir, 'mni', '*.png')):
+                shutil.copyfile(png_file, os.path.join(self.output_path, 'output_mni', png_file.split('/')[-1]))
+
         if not self.keep_tmp_files:
             shutil.rmtree(self.tmp_out_dir)
 
@@ -236,6 +239,13 @@ class IslesEnsemble:
         path_voting = self.ensemble_path
         command_voting = f'python ./src/majority_voting.py -i {self.tmp_out_dir} -o {self.output_path} '
         subprocess.call(command_voting, shell=True, cwd=path_voting)
+        # generate screenshots
+
+        out_qc_path = self.output_path + '/output_screenshot.png'
+        registration_qc([self.input_dwi_path, self.input_adc_path],
+                    ['dwi', 'adc'],
+                        out_qc_path,
+                        os.path.join(self.output_path,  'lesion_msk.nii.gz'))
 
     def register_images(self):
         os.mkdir(self.tmp_out_dir+'/flair/reg')
@@ -247,11 +257,12 @@ class IslesEnsemble:
         self.reg_brain_mask = os.path.join(self.tmp_out_dir, 'flair', 'reg', 'brain_msk_reg.nii.gz')
 
     def register_mni(self):
-        if not os.path.exists(os.path.dirname(self.mni_flair_path)):
-            os.mkdir(os.path.dirname(self.mni_flair_path))
-        get_flair_atlas(self.mni_flair_path)
-
         if self.results_mni:
+
+            if not os.path.exists(os.path.dirname(self.mni_flair_path)):
+                os.mkdir(os.path.dirname(self.mni_flair_path))
+            get_flair_atlas(self.mni_flair_path)
+
             os.mkdir(self.tmp_out_dir + '/mni')
             if not self.skull_strip: # first register flair to dwi if ss not done-  later propagate all images
                 self.reg_flair = self.tmp_out_dir + '/flair/flair_ss_reg.nii.gz'
@@ -271,7 +282,10 @@ class IslesEnsemble:
             if self.skull_strip:
                 propagate_image(self.reg_brain_mask, self.tmp_out_dir + '/mni/brain_msk-mni.nii.gz', is_mask=True)
 
-            out_qc_path = os.path.join(os.path.dirname(self.output_path), 'qc', self.original_dwi_path.split('/')[-3] + '.png')
+            out_qc_path = self.tmp_out_dir + '/mni/output_screenshot-mni.png'
             registration_qc([self.tmp_out_dir + '/mni/dwi-mni.nii.gz', self.tmp_out_dir + '/mni/adc-mni.nii.gz',
-                             self.tmp_out_dir + '/mni/flair-mni.nii.gz', self.mni_flair_path],
-                            out_qc_path, mask_path)
+                            self.tmp_out_dir + '/mni/flair-mni.nii.gz', self.mni_flair_path],
+                            ['dwi', 'adc', 'flair', 'MNI flair atlas'],
+                            out_qc_path,
+                            self.tmp_out_dir + '/mni/lesion_msk-mni.nii.gz',
+                            mask_path)

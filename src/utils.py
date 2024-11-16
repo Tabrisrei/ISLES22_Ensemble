@@ -206,10 +206,11 @@ def get_flair_atlas(output_path):
             f.write(response.content)
 
 
-def registration_qc(image_paths, output_path, mask_path=None):
-    # Load mask if provided
-    if mask_path is not None:
-        brain = nib.load(mask_path).get_fdata()
+# Load brain mask if provided
+def registration_qc(image_paths, labels, output_path, lesion_msk_path, brain_mask_path=None):
+    # Load brain mask if provided
+    if brain_mask_path is not None:
+        brain = nib.load(brain_mask_path).get_fdata()
     else:
         brain = None
 
@@ -218,37 +219,78 @@ def registration_qc(image_paths, output_path, mask_path=None):
 
     # Set brain mask if mask not provided
     if brain is None:
-        brain = 1.0 * (images[1] > 0.1)  # Use first image as mask reference
-    brain[brain == 0] = np.nan  # Replace zeroes with NaN for transparency
+        brain = 1.0 * (images[1] > 0.1)  # Use the second image as mask reference
 
-    # Get the number of images
+    # Set background to NaN for transparency
+    brain[brain == 0] = np.nan
+
+    # Load lesion mask
+    lesion_msk = nib.load(lesion_msk_path).get_fdata()
+
+    # Determine the slice with the largest number of positive pixels for each view
+    lesion_sums_axial = np.sum(lesion_msk > 0, axis=(0, 1))
+    lesion_sums_sagittal = np.sum(lesion_msk > 0, axis=(1, 2))
+    lesion_sums_coronal = np.sum(lesion_msk > 0, axis=(0, 2))
+
+    best_slice_axial = np.argmax(lesion_sums_axial) if np.any(lesion_sums_axial > 0) else lesion_msk.shape[-1] // 2
+    best_slice_sagittal = np.argmax(lesion_sums_sagittal) if np.any(lesion_sums_sagittal > 0) else lesion_msk.shape[0] // 2
+    best_slice_coronal = np.argmax(lesion_sums_coronal) if np.any(lesion_sums_coronal > 0) else lesion_msk.shape[1] // 2
+
+    lesion_msk[lesion_msk == 0] = np.nan
+
+    # Get the number of images and set up the figure
     num_images = len(images)
+    num_views = 3  # Axial, sagittal, coronal
+    plt.figure(figsize=(5 * num_images, 5 * num_views * 2), dpi=80, facecolor='black')  # Adjusted height for views
+    plt.subplots_adjust(left=0.0001,
+                        bottom=0.001,
+                        right=0.9999,
+                        top=0.98,
+                        wspace=0.,
+                        hspace=0.)
 
-    # Calculate the central slice
-    central_slice = round(images[0].shape[-1] / 2)
+    # Plot each view
+    for view_idx, (best_slice, axis_label) in enumerate(zip(
+        [best_slice_axial, best_slice_sagittal, best_slice_coronal],
+        ["Axial", "Sagittal", "Coronal"]
+    )):
+        for row in range(2):  # Two rows for each view
+            for i, img in enumerate(images):
+                plt.subplot(num_views * 2, num_images, (view_idx * 2 + row) * num_images + i + 1)
+                img[np.isnan(brain)] = np.nan
 
-    # Set up the figure size dynamically based on number of images
-    plt.figure(figsize=(5 * num_images, 5), dpi=80, facecolor='black')
-    #plt.style.use("dark_background")
-    plt.subplots_adjust(left=0.01,
-                        bottom=0.01,
-                        right=0.99,
-                        top=0.99,
-                        wspace=0.1,
-                        hspace=0)
+                if axis_label == "Axial":
+                    img_slice = img[:, :, best_slice]
+                    lesion_slice = lesion_msk[:, :, best_slice]
+                    brain_slice = brain[:, :, best_slice]
+                elif axis_label == "Sagittal":
+                    img_slice = img[best_slice, :, :]
+                    lesion_slice = lesion_msk[best_slice, :, :]
+                    brain_slice = brain[best_slice, :, :]
+                elif axis_label == "Coronal":
+                    img_slice = img[:, best_slice, :]
+                    lesion_slice = lesion_msk[:, best_slice, :]
+                    brain_slice = brain[:, best_slice, :]
 
-    # Plot each image with the mask overlay
-    for i, img in enumerate(images):
-        plt.subplot(1, num_images, i + 1)
-        plt.imshow(np.rot90(img[:, :, central_slice]), 'gray')
-        plt.imshow(np.rot90(brain[:, :, central_slice]), 'Accent', interpolation='none', alpha=0.3)
-        plt.axis('off')
+                plt.imshow(np.rot90(img_slice), 'gray')
+                if row == 1:  # Only add lesion overlay for the first row
+                    plt.imshow(np.rot90(lesion_slice), 'hsv', interpolation='none', alpha=0.5)
+                plt.axis('off')
+
+                # Add titles only for the first row of axial images
+                if view_idx == 0 and row == 0:
+                    plt.title(labels[i], color='white', fontsize=14)
+
+        # Add view label to the left side of the plot
+        plt.text(-0.1, 0.5 - view_idx / 2, axis_label, color="white", fontsize=16,
+                 rotation=90, transform=plt.gcf().transFigure)
 
     # Show and save the figure
     plt.savefig(output_path)
     #plt.show()
 
-    #plt.close('all')
+
+
 
 if __name__ == '__main__':
     convert_to_nii('dwi', '/home/edelarosa/Documents/datasets/dwi_dcm')
