@@ -1,7 +1,7 @@
 ![alt text](https://github.com/Tabrisrei/ISLES22_Ensemble/blob/master/ensemble-logo.png)
 
 # DeepIsles
-##ISLES'22 Ischemic Stroke Lesion Segmentation  
+## ISLES'22 Ischemic Stroke Lesion Segmentation  
 
 ## Introduction
 Algorithm to predict ischemic stroke lesions from MRI data.
