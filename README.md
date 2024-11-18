@@ -111,9 +111,9 @@ docker run --gpus all -v /*path*/ISLES22_Ensemble/data:/app/data deepisles --dwi
 
 
 ## Get started 
-Try out our algorithm running:
+Try DeepIsles out over the provided example data:
 ```bash
- python scripts/predict_scan.py
+ python scripts/predict.py
 ```
 
 The example scan belongs to the ISLES'22 dataset (Hernandez Petzsche et al., Sci Data 2022).
