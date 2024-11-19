@@ -208,18 +208,14 @@ def get_flair_atlas(output_path):
 
 # Load brain mask if provided
 def registration_qc(image_paths, labels, output_path, lesion_msk_path, brain_mask_path=None):
+    # Load images
+    images = [nib.load(img_path).get_fdata() for img_path in image_paths]
+
     # Load brain mask if provided
     if brain_mask_path is not None:
         brain = nib.load(brain_mask_path).get_fdata()
     else:
-        brain = None
-
-    # Load images
-    images = [nib.load(img_path).get_fdata() for img_path in image_paths]
-
-    # Set brain mask if mask not provided
-    if brain is None:
-        brain = 1.0 * (images[1] > 0.1)  # Use the second image as mask reference
+        brain = 1.0 * (images[0] > 0.1)  # Use the second image as mask reference
 
     # Set background to NaN for transparency
     brain[brain == 0] = np.nan

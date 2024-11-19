@@ -67,7 +67,7 @@ class IslesEnsemble:
         print_ensemble_message()
 
 
-        # proicess
+        # process
         self.load_images()
         self.check_images()
         self.extract_brain()
@@ -242,10 +242,11 @@ class IslesEnsemble:
         # generate screenshots
 
         out_qc_path = self.output_path + '/output_screenshot.png'
+        brain_msk_path = self.reg_brain_mask if hasattr(self, 'reg_brain_mask') else None
         registration_qc([self.input_dwi_path, self.input_adc_path],
                     ['dwi', 'adc'],
                         out_qc_path,
-                        os.path.join(self.output_path,  'lesion_msk.nii.gz'))
+                        os.path.join(self.output_path,  'lesion_msk.nii.gz'), brain_msk_path)
 
     def register_images(self):
         os.mkdir(self.tmp_out_dir+'/flair/reg')
